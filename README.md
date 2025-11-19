@@ -71,6 +71,7 @@ buyuk-chamlija/
 ## Available Scripts
 
 - `npx expo start` - Start the Expo development server
+- `npx expo start --clear` - Start with cleared cache (recommended if you encounter issues)
 - `npx expo run android` - Run on Android device/emulator
 - `npx expo run ios` - Run on iOS device/simulator (macOS only)
 - `npx expo run web` - Run in web browser
