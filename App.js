@@ -1,20 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native'; // Added Text for visibility
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+// import { GestureHandlerRootView } from 'react-native-gesture-handler'; // REMOVED
+import AppNavigator from './src/navigation/AppNavigator';
+import { festivals as mockFestivals, activities as mockActivities, faqs as mockFaqs } from './src/data/mockData';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [festivals, setFestivals] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+
+  useEffect(() => {
+    // ... (Your original useEffect logic remains here)
+    const loadData = async () => {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      setFestivals(mockFestivals);
+      setActivities(mockActivities);
+      setFaqs(mockFaqs);
+      setIsLoading(false);
+    };
+
+    loadData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="tomato" />
+        <Text>Loading App...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    // REMOVED GestureHandlerRootView
+    <SafeAreaProvider>
+      <AppNavigator festivals={festivals} activities={activities} faqs={faqs} />
+    </SafeAreaProvider>
+    // END of REMOVED GestureHandlerRootView
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
