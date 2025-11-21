@@ -1,8 +1,8 @@
 export const festivals = [
   {
-    id: "1",
-    name: "Annual Community Gathering 2025",
-    theme: "Winter Wool",
+    id: '1',
+    name: 'Fig',
+    theme: 'Winter Wool',
     isActive: true,
     startDate: "2025-09-29",
     endDate: "2025-09-31",
