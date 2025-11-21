@@ -20,7 +20,7 @@ export const festivals = [
   {
     id: "2",
     name: "Cherry & Berry",
-    theme: "Blooming Together",
+    theme: "Cherry Blossom Festival",
     isActive: false,
     startDate: "2026-04-15",
     endDate: "2026-04-17",
