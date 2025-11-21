@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import EventDetailModal from '../components/EventDetailModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen({ festivals }) {
@@ -83,26 +84,11 @@ export default function HomeScreen({ festivals }) {
                     contentContainerStyle={styles.listContent}
                 />
 
-                <Modal
+                <EventDetailModal
                     visible={!!selectedFestival}
-                    animationType="slide"
-                    transparent={true}
-                    onRequestClose={() => setSelectedFestival(null)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            {selectedFestival && (
-                                <>
-                                    <Text style={styles.modalTitle}>{selectedFestival.name}</Text>
-                                    <Text style={styles.modalText}>Operating Hours: {selectedFestival.operatingHours}</Text>
-                                    <Text style={styles.modalText}>Adult Fee: {selectedFestival.entranceFeeAdult}</Text>
-                                    <Text style={styles.modalText}>Child Fee: {selectedFestival.entranceFeeChild}</Text>
-                                    <Button title="Close" onPress={() => setSelectedFestival(null)} color="#6B4FA0" />
-                                </>
-                            )}
-                        </View>
-                    </View>
-                </Modal>
+                    event={selectedFestival}
+                    onClose={() => setSelectedFestival(null)}
+                />
             </View>
         </SafeAreaView>
     );
