@@ -11,7 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const GAP = 15;
 const PADDING = 20;
 
-export default function HomeScreen({ festivals }) {
+export default function HomeScreen(props) {
+    const { festivals } = props;
     const [selectedFestival, setSelectedFestival] = useState(null);
     const [selectedStall, setSelectedStall] = useState(null);
     const [showAllStalls, setShowAllStalls] = useState(false);
@@ -109,6 +110,14 @@ export default function HomeScreen({ festivals }) {
                 visible={!!selectedStall}
                 stall={selectedStall}
                 onClose={() => setSelectedStall(null)}
+                onBook={(stall) => {
+                    // Navigate to Reservation tab and pass stallId
+                    // We need to access navigation prop here
+                    // HomeScreen receives 'navigation' prop from Tab.Screen
+                    if (props.navigation) {
+                        props.navigation.navigate('Reservation', { stallId: stall.id });
+                    }
+                }}
             />
             <AllStallsModal
                 visible={showAllStalls}
