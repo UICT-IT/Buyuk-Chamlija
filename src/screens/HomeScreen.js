@@ -1,249 +1,245 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, useWindowDimensions, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { stalls } from '../data/mockData';
 import EventDetailModal from '../components/EventDetailModal';
+import StallDetailModal from '../components/StallDetailModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const GAP = 15;
+const PADDING = 20;
 
 export default function HomeScreen({ festivals }) {
     const [selectedFestival, setSelectedFestival] = useState(null);
+    const [selectedStall, setSelectedStall] = useState(null);
+    const { width } = useWindowDimensions();
 
-    const activeFestival = festivals.find(f => f.isActive);
+    // Responsive calculations
+    const numColumns = width > 700 ? 3 : 2;
+    const stallCardWidth = (width - (PADDING * 2) - (GAP * (numColumns - 1))) / numColumns;
+
     const upcomingFestivals = festivals.filter(f => !f.isActive);
 
     const renderFestivalItem = ({ item }) => (
-        <TouchableOpacity style={styles.upcomingCard} onPress={() => setSelectedFestival(item)}>
-            <Text style={styles.upcomingTitle}>{item.name}</Text>
-
-            <View style={styles.upcomingInfoRow}>
-                <Text style={styles.upcomingIcon}>📅</Text>
-                <Text style={styles.upcomingInfoText}>{item.dateTime}</Text>
+        <TouchableOpacity style={styles.festivalCard} onPress={() => setSelectedFestival(item)}>
+            <View style={styles.festivalInfo}>
+                <Text style={styles.festivalDateText}>{item.dateTime}</Text>
+                <Text style={styles.festivalTitle}>{item.name}</Text>
             </View>
+            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+        </TouchableOpacity>
+    );
 
-            <View style={styles.upcomingInfoRow}>
-                <Text style={styles.upcomingIcon}>📍</Text>
-                <Text style={styles.upcomingInfoText}>{item.venue}</Text>
-            </View>
-
-            <View style={styles.upcomingInfoRow}>
-                <Text style={styles.upcomingIcon}>👥</Text>
-                <Text style={styles.upcomingInfoText}>
-                    {item.currentAttendance}/{item.maxAttendance} attending
-                </Text>
+    const renderStallItem = ({ item, cardWidth }) => (
+        <TouchableOpacity
+            style={[styles.stallCard, { height: cardWidth * 0.8 }]}
+            onPress={() => setSelectedStall(item)}
+        >
+            <Image source={item.image} style={styles.stallImage} />
+            <View style={styles.stallOverlay}>
+                <Text style={styles.stallName}>{item.name}</Text>
             </View>
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
-                {activeFestival && (
-                    <View style={styles.currentEventSection}>
-                        <Text style={styles.currentEventHeader}>Current Event</Text>
-                        <View style={styles.eventCard}>
-                            <Text style={styles.eventTitle}>{activeFestival.name}</Text>
-
-                            <View style={styles.eventInfoRow}>
-                                <Text style={styles.eventIcon}>📅</Text>
-                                <Text style={styles.eventInfoText}>{activeFestival.dateTime}</Text>
-                            </View>
-
-                            <View style={styles.eventInfoRow}>
-                                <Text style={styles.eventIcon}>📍</Text>
-                                <Text style={styles.eventInfoText}>{activeFestival.venue}</Text>
-                            </View>
-
-                            <View style={styles.eventInfoRow}>
-                                <Text style={styles.eventIcon}>👥</Text>
-                                <Text style={styles.eventInfoText}>
-                                    {activeFestival.currentAttendance}/{activeFestival.maxAttendance} attending
-                                </Text>
-                            </View>
-
-                            <Text style={styles.eventDescription}>{activeFestival.description}</Text>
-
-                            <View style={styles.buttonContainer}>
-                                <TouchableOpacity
-                                    style={styles.viewDetailsButton}
-                                    onPress={() => setSelectedFestival(activeFestival)}
-                                >
-                                    <Text style={styles.viewDetailsButtonText}>View Details</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={styles.leaveReviewButton}>
-                                    <Text style={styles.leaveReviewButtonText}>Leave Review</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Header Section */}
+                <View style={styles.headerContainer}>
+                    <View>
+                        <Text style={styles.welcomeText}>Welcome to</Text>
+                        <Text style={styles.brandText}>Buyuk Chamlija</Text>
                     </View>
-                )}
+                </View>
 
-                <Text style={styles.sectionHeader}>Upcoming Festivals</Text>
-                <FlatList
-                    data={upcomingFestivals}
-                    renderItem={renderFestivalItem}
-                    keyExtractor={item => item.id}
-                    contentContainerStyle={styles.listContent}
-                />
+                {/* Stalls Section */}
+                <View style={styles.sectionContainer}>
+                    <View style={styles.sectionHeaderRow}>
+                        <View style={styles.sectionTitleRow}>
+                            <Ionicons name="storefront-outline" size={24} color="#333" style={styles.sectionIcon} />
+                            <Text style={styles.sectionHeader}>Stalls</Text>
+                        </View>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => console.log('View All Stalls')}>
+                            <Text style={styles.viewAllText}>View All</Text>
+                            <Ionicons name="arrow-forward" size={18} color="tomato" />
+                        </TouchableOpacity>
+                    </View>
 
-                <EventDetailModal
-                    visible={!!selectedFestival}
-                    event={selectedFestival}
-                    onClose={() => setSelectedFestival(null)}
-                />
-            </View>
+                    <View style={styles.stallsGrid}>
+                        {stalls.map((stall) => (
+                            <View key={stall.id} style={[styles.stallWrapper, { width: stallCardWidth }]}>
+                                {renderStallItem({ item: stall, cardWidth: stallCardWidth })}
+                            </View>
+                        ))}
+                    </View>
+                </View>
+
+                {/* Upcoming Festivals Section */}
+                <View style={styles.sectionContainer}>
+                    <View style={styles.sectionHeaderRow}>
+                        <View style={styles.sectionTitleRow}>
+                            <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
+                            <Text style={styles.sectionHeader}>Upcoming Festivals</Text>
+                        </View>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => console.log('View All Festivals')}>
+                            <Text style={styles.viewAllText}>View All</Text>
+                            <Ionicons name="arrow-forward" size={18} color="tomato" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {upcomingFestivals.map((festival) => (
+                        <View key={festival.id} style={styles.festivalWrapper}>
+                            {renderFestivalItem({ item: festival })}
+                        </View>
+                    ))}
+                </View>
+            </ScrollView>
+
+            <EventDetailModal
+                visible={!!selectedFestival}
+                event={selectedFestival}
+                onClose={() => setSelectedFestival(null)}
+            />
+            <StallDetailModal
+                visible={!!selectedStall}
+                stall={selectedStall}
+                onClose={() => setSelectedStall(null)}
+            />
         </SafeAreaView>
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f5f5f5', // Light background
     },
-    content: {
-        flex: 1,
-        padding: 20,
+    scrollContent: {
+        paddingBottom: 40,
     },
-    currentEventSection: {
+    headerContainer: {
+        padding: PADDING,
+        paddingTop: 60,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
         marginBottom: 20,
     },
-    currentEventHeader: {
+    welcomeText: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#333',
+    },
+    brandText: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#333',
+        marginTop: 4,
+    },
+    sectionContainer: {
+        paddingHorizontal: PADDING,
+        marginBottom: 25,
+    },
+    sectionHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    sectionTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sectionIcon: {
+        marginRight: 10,
+    },
+    sectionHeader: {
         fontSize: 20,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 12,
     },
-    eventCard: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 12,
+    viewAllBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    viewAllText: {
+        color: 'tomato',
+        fontSize: 14,
+        marginRight: 5,
+    },
+
+    // Stalls Grid
+    stallsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    stallWrapper: {
+        marginBottom: GAP,
+    },
+    stallCard: {
+        width: '100%',
+        // Height is set dynamically
+        borderRadius: 16,
+        overflow: 'hidden',
+        position: 'relative',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
     },
-    eventTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
-        marginBottom: 16,
+    stallImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
-    eventInfoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    eventIcon: {
-        fontSize: 16,
-        marginRight: 8,
-    },
-    eventInfoText: {
-        fontSize: 14,
-        color: '#666',
-    },
-    eventDescription: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 8,
-        marginBottom: 20,
-        lineHeight: 20,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        gap: 12,
-    },
-    viewDetailsButton: {
-        flex: 1,
-        backgroundColor: 'tomato',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    viewDetailsButtonText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    leaveReviewButton: {
-        flex: 1,
-        backgroundColor: 'white',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    leaveReviewButtonText: {
-        color: '#333',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    sectionHeader: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        marginTop: 10,
-    },
-    listContent: {
-        paddingBottom: 20,
-    },
-    upcomingCard: {
-        backgroundColor: 'white',
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 3,
-        elevation: 2,
-    },
-    upcomingTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
-        marginBottom: 12,
-    },
-    upcomingInfoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    upcomingIcon: {
-        fontSize: 14,
-        marginRight: 8,
-    },
-    upcomingInfoText: {
-        fontSize: 13,
-        color: '#666',
-    },
-    modalOverlay: {
-        flex: 1,
+    stallOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
+        padding: 10,
         alignItems: 'center',
     },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 25,
-        borderRadius: 15,
-        width: '80%',
-        alignItems: 'center',
-    },
-    modalTitle: {
-        fontSize: 22,
+    stallName: {
+        color: 'white',
+        fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 15,
         textAlign: 'center',
     },
-    modalText: {
-        fontSize: 16,
-        marginBottom: 10,
+
+    // Upcoming Festivals
+    festivalWrapper: {
+        marginBottom: 15,
+    },
+    festivalCard: {
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    festivalInfo: {
+        flex: 1,
+    },
+    festivalTitle: {
+        color: '#333',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    festivalDateText: {
+        color: '#666',
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 4,
     },
 });
-
