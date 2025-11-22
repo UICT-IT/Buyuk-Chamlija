@@ -36,6 +36,27 @@ export const festivals = [
   },
 ];
 
+export const stalls = [
+  {
+    id: 's1',
+    name: 'The Barn',
+    image: require('../../assets/stalls/The Barn.jpg'),
+    about: "Wouldn't you like to turn your wedding celebrations into an unforgettable memory? The Barn is the perfect place for you.",
+  },
+  {
+    id: 's2',
+    name: 'Country Bazaar',
+    image: require('../../assets/stalls/Country Bazaar.jpg'),
+    about: "Imagine walking through Istanbul's Grand Bazaar. In our market, you will feel that same atmosphere -- you'll feel as if you are right in Istanbul.",
+  },
+  {
+    id: 's3',
+    name: 'Karinja Cafe',
+    image: require('../../assets/stalls/KarinjaCafe.jpg'),
+    about: "Karinja Cafe attracts attention with its design reminiscent of an ant nest. You can find the unique flavors of Turkish cuisine. Reserve your spot now!",
+  },
+];
+
 export const activities = [
   {
     id: "a1",
