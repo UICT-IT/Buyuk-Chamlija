@@ -19,10 +19,13 @@ export default function EventDetailModal({ visible, onClose, event }) {
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     {/* Header Image Section */}
                     <View style={styles.imageContainer}>
-                        {/* Placeholder for Event Image - using a colored view for now or a placeholder image */}
-                        <View style={[styles.eventImage, { backgroundColor: event.isActive ? '#FF6347' : '#6B4FA0' }]}>
-                            <Ionicons name="image-outline" size={64} color="rgba(255,255,255,0.5)" />
-                        </View>
+                        {event.image ? (
+                            <Image source={event.image} style={styles.eventImage} resizeMode="cover" />
+                        ) : (
+                            <View style={[styles.eventImage, { backgroundColor: event.isActive ? '#FF6347' : '#6B4FA0' }]}>
+                                <Ionicons name="image-outline" size={64} color="rgba(255,255,255,0.5)" />
+                            </View>
+                        )}
 
                         {/* Header Buttons */}
                         <View style={styles.headerButtons}>

@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { stalls } from '../data/mockData';
 import EventDetailModal from '../components/EventDetailModal';
 import StallDetailModal from '../components/StallDetailModal';
+import AllStallsModal from '../components/AllStallsModal';
+import AllFestivalsModal from '../components/AllFestivalsModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const GAP = 15;
@@ -12,6 +14,8 @@ const PADDING = 20;
 export default function HomeScreen({ festivals }) {
     const [selectedFestival, setSelectedFestival] = useState(null);
     const [selectedStall, setSelectedStall] = useState(null);
+    const [showAllStalls, setShowAllStalls] = useState(false);
+    const [showAllFestivals, setShowAllFestivals] = useState(false);
     const { width } = useWindowDimensions();
 
     // Responsive calculations
@@ -60,14 +64,14 @@ export default function HomeScreen({ festivals }) {
                             <Ionicons name="storefront-outline" size={24} color="#333" style={styles.sectionIcon} />
                             <Text style={styles.sectionHeader}>Stalls</Text>
                         </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => console.log('View All Stalls')}>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllStalls(true)}>
                             <Text style={styles.viewAllText}>View All</Text>
                             <Ionicons name="arrow-forward" size={18} color="tomato" />
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.stallsGrid}>
-                        {stalls.map((stall) => (
+                        {stalls.slice(0, 4).map((stall) => (
                             <View key={stall.id} style={[styles.stallWrapper, { width: stallCardWidth }]}>
                                 {renderStallItem({ item: stall, cardWidth: stallCardWidth })}
                             </View>
@@ -82,13 +86,13 @@ export default function HomeScreen({ festivals }) {
                             <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
                             <Text style={styles.sectionHeader}>Upcoming Festivals</Text>
                         </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => console.log('View All Festivals')}>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllFestivals(true)}>
                             <Text style={styles.viewAllText}>View All</Text>
                             <Ionicons name="arrow-forward" size={18} color="tomato" />
                         </TouchableOpacity>
                     </View>
 
-                    {upcomingFestivals.map((festival) => (
+                    {upcomingFestivals.slice(0, 3).map((festival) => (
                         <View key={festival.id} style={styles.festivalWrapper}>
                             {renderFestivalItem({ item: festival })}
                         </View>
@@ -105,6 +109,25 @@ export default function HomeScreen({ festivals }) {
                 visible={!!selectedStall}
                 stall={selectedStall}
                 onClose={() => setSelectedStall(null)}
+            />
+            <AllStallsModal
+                visible={showAllStalls}
+                onClose={() => setShowAllStalls(false)}
+                onSelect={(stall) => {
+                    setSelectedStall(stall);
+                    // Optional: Close the list modal if you want only one modal open at a time
+                    // setShowAllStalls(false);
+                }}
+            />
+            <AllFestivalsModal
+                visible={showAllFestivals}
+                festivals={upcomingFestivals}
+                onClose={() => setShowAllFestivals(false)}
+                onSelect={(festival) => {
+                    setSelectedFestival(festival);
+                    // Optional: Close the list modal if you want only one modal open at a time
+                    // setShowAllFestivals(false); 
+                }}
             />
         </SafeAreaView>
     );
