@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-export default function StallDetailModal({ visible, onClose, stall }) {
+export default function StallDetailModal({ visible, onClose, stall, onBook }) {
     if (!stall) return null;
 
     return (
@@ -54,6 +54,17 @@ export default function StallDetailModal({ visible, onClose, stall }) {
                                 ))}
                             </View>
                         </View>
+
+                        {/* Book Button */}
+                        <TouchableOpacity
+                            style={styles.bookButton}
+                            onPress={() => {
+                                onClose();
+                                onBook(stall);
+                            }}
+                        >
+                            <Text style={styles.bookButtonText}>Book Reservation</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
@@ -132,5 +143,23 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    bookButton: {
+        backgroundColor: 'tomato',
+        paddingVertical: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 20,
+        shadowColor: 'tomato',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    bookButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });

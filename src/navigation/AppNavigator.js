@@ -1,8 +1,9 @@
 import React from 'react';
+// AppNavigator - Main navigation configuration
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '../screens/HomeScreen';
-import ProgramScreen from '../screens/ProgramScreen';
+import ReservationScreen from '../screens/ReservationScreen';
 import InfoScreen from '../screens/InfoScreen';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,7 +23,7 @@ export default function AppNavigator({ festivals, activities, faqs }) {
 
                         if (route.name === 'Home') {
                             iconName = focused ? 'home' : 'home-outline';
-                        } else if (route.name === 'Program') {
+                        } else if (route.name === 'Reservation') {
                             iconName = focused ? 'calendar' : 'calendar-outline';
                         } else if (route.name === 'Info') {
                             iconName = focused ? 'information-circle' : 'information-circle-outline';
@@ -37,8 +38,8 @@ export default function AppNavigator({ festivals, activities, faqs }) {
                 <Tab.Screen name="Home">
                     {props => <HomeScreen {...props} festivals={festivals} />}
                 </Tab.Screen>
-                <Tab.Screen name="Program">
-                    {props => <ProgramScreen {...props} activities={activities} />}
+                <Tab.Screen name="Reservation">
+                    {props => <ReservationScreen {...props} />}
                 </Tab.Screen>
                 <Tab.Screen name="Info">
                     {props => <InfoScreen {...props} faqs={faqs} />}
