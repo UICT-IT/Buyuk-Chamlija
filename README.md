@@ -1,4 +1,4 @@
-# Kermes Festival App
+# Buyuk Chamlija
 
 A React Native mobile application built with Expo for the Kermus Festival. This app provides festival attendees with event information, activity schedules, and FAQs.
 
