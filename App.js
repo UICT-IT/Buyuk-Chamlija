@@ -5,6 +5,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { festivals as mockFestivals, activities as mockActivities, faqs as mockFaqs } from './src/data/mockData';
 
+import { AuthProvider } from './src/context/AuthContext';
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [festivals, setFestivals] = useState([]);
@@ -38,7 +40,9 @@ export default function App() {
   return (
     // REMOVED GestureHandlerRootView
     <SafeAreaProvider>
-      <AppNavigator festivals={festivals} activities={activities} faqs={faqs} />
+      <AuthProvider>
+        <AppNavigator festivals={festivals} activities={activities} faqs={faqs} />
+      </AuthProvider>
     </SafeAreaProvider>
     // END of REMOVED GestureHandlerRootView
   );
