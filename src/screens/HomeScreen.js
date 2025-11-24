@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, useWindowDimensions, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { stalls } from '../data/mockData';
+import { stalls, activities } from '../data/mockData';
 import EventDetailModal from '../components/EventDetailModal';
 import StallDetailModal from '../components/StallDetailModal';
 import AllStallsModal from '../components/AllStallsModal';
 import AllFestivalsModal from '../components/AllFestivalsModal';
+import AllActivitiesModal from '../components/AllActivitiesModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const GAP = 20; // Increased gap
@@ -17,7 +18,18 @@ export default function HomeScreen(props) {
     const [selectedStall, setSelectedStall] = useState(null);
     const [showAllStalls, setShowAllStalls] = useState(false);
     const [showAllFestivals, setShowAllFestivals] = useState(false);
+    const [showAllActivities, setShowAllActivities] = useState(false);
     const { width } = useWindowDimensions();
+
+    // Responsive styles
+    const responsiveStyles = {
+        sectionHeader: {
+            fontSize: width > 600 ? 22 : 20,
+        },
+        welcomeMessage: {
+            fontSize: width > 600 ? 32 : 28,
+        },
+    };
 
     // Responsive calculations
     // Keep 2 columns for mobile to make them wide, 3 for tablet, 4 for desktop
@@ -65,10 +77,13 @@ export default function HomeScreen(props) {
 
                 {/* Stalls Section */}
                 <View style={styles.sectionContainer}>
+                    {/* Welcome Message */}
+                    <Text style={[styles.welcomeMessage, responsiveStyles.welcomeMessage]}>Welcome to{"\n"}Buyuk Chamlija</Text>
+
                     <View style={styles.sectionHeaderRow}>
                         <View style={styles.sectionTitleRow}>
                             <Ionicons name="storefront-outline" size={24} color="#333" style={styles.sectionIcon} />
-                            <Text style={styles.sectionHeader}>Stalls</Text>
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Stalls</Text>
                         </View>
                         <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllStalls(true)}>
                             <Text style={styles.viewAllText}>View All</Text>
@@ -90,7 +105,7 @@ export default function HomeScreen(props) {
                     <View style={styles.sectionHeaderRow}>
                         <View style={styles.sectionTitleRow}>
                             <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
-                            <Text style={styles.sectionHeader}>Upcoming Festivals</Text>
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Upcoming Festivals</Text>
                         </View>
                         <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllFestivals(true)}>
                             <Text style={styles.viewAllText}>View All</Text>
@@ -101,6 +116,44 @@ export default function HomeScreen(props) {
                     {upcomingFestivals.slice(0, 3).map((festival) => (
                         <View key={festival.id} style={styles.festivalWrapper}>
                             {renderFestivalItem({ item: festival })}
+                        </View>
+                    ))}
+                </View>
+
+                {/* Activities Section */}
+                <View style={styles.sectionContainer}>
+                    <View style={styles.sectionHeaderRow}>
+                        <View style={styles.sectionTitleRow}>
+                            <Ionicons name="fitness-outline" size={24} color="#333" style={styles.sectionIcon} />
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Activities</Text>
+                        </View>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllActivities(true)}>
+                            <Text style={styles.viewAllText}>View All</Text>
+                            <Ionicons name="arrow-forward" size={18} color="tomato" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {activities.slice(0, 2).map((activity) => (
+                        <View key={activity.id} style={styles.activityCard}>
+                            <View style={styles.activityIconContainer}>
+                                <Ionicons name="calendar" size={20} color="tomato" />
+                            </View>
+                            <View style={styles.activityInfo}>
+                                <Text style={styles.activityName}>{activity.name}</Text>
+                                <View style={styles.activityDetails}>
+                                    <View style={styles.activityDetailItem}>
+                                        <Ionicons name="time-outline" size={14} color="#666" />
+                                        <Text style={styles.activityDetailText}>{activity.startTime}</Text>
+                                    </View>
+                                    <View style={styles.activityDetailItem}>
+                                        <Ionicons name="location-outline" size={14} color="#666" />
+                                        <Text style={styles.activityDetailText}>{activity.location}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.activityCategoryBadge}>
+                                <Text style={styles.activityCategoryText}>{activity.category}</Text>
+                            </View>
                         </View>
                     ))}
                 </View>
@@ -128,9 +181,8 @@ export default function HomeScreen(props) {
                 visible={showAllStalls}
                 onClose={() => setShowAllStalls(false)}
                 onSelect={(stall) => {
+                    setShowAllStalls(false);
                     setSelectedStall(stall);
-                    // Optional: Close the list modal if you want only one modal open at a time
-                    // setShowAllStalls(false);
                 }}
             />
             <AllFestivalsModal
@@ -138,10 +190,13 @@ export default function HomeScreen(props) {
                 festivals={upcomingFestivals}
                 onClose={() => setShowAllFestivals(false)}
                 onSelect={(festival) => {
+                    setShowAllFestivals(false);
                     setSelectedFestival(festival);
-                    // Optional: Close the list modal if you want only one modal open at a time
-                    // setShowAllFestivals(false); 
                 }}
+            />
+            <AllActivitiesModal
+                visible={showAllActivities}
+                onClose={() => setShowAllActivities(false)}
             />
         </SafeAreaView>
     );
@@ -167,8 +222,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     logo: {
-        width: 50, // Reverted to smaller size
-        height: 50,
+        width: 60,
+        height: 60,
         resizeMode: 'contain',
     },
     sectionContainer: {
@@ -189,7 +244,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     sectionHeader: {
-        fontSize: 20, // Reduced from 24
+        fontSize: 20,
         fontWeight: 'bold',
         color: '#333',
     },
@@ -201,6 +256,13 @@ const styles = StyleSheet.create({
         color: 'tomato',
         fontSize: 14, // Reduced from 16
         marginRight: 5,
+    },
+    welcomeMessage: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 20,
+        textAlign: 'left',
     },
 
     // Stalls Grid
@@ -275,5 +337,62 @@ const styles = StyleSheet.create({
         fontSize: 14, // Reduced from 16
         fontWeight: '600',
         marginBottom: 6,
+    },
+
+    // Activities
+    activityCard: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    activityIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255, 99, 71, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    activityInfo: {
+        flex: 1,
+    },
+    activityName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 6,
+    },
+    activityDetails: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    activityDetailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    activityDetailText: {
+        fontSize: 12,
+        color: '#666',
+    },
+    activityCategoryBadge: {
+        backgroundColor: 'rgba(255, 99, 71, 0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 12,
+    },
+    activityCategoryText: {
+        fontSize: 12,
+        color: 'tomato',
+        fontWeight: '600',
     },
 });

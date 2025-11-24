@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { stalls } from '../data/mockData';
 
 export default function AllStallsModal({ visible, onClose, onSelect }) {
     const renderStallItem = ({ item }) => (
-        <TouchableOpacity style={styles.stallCard} onPress={() => onSelect(item)}>
+        <TouchableOpacity
+            style={styles.stallCard}
+            onPress={() => onSelect(item)}
+            activeOpacity={0.7}
+        >
             <Image source={item.image} style={styles.stallImage} />
             <View style={styles.stallInfo}>
                 <Text style={styles.stallName}>{item.name}</Text>

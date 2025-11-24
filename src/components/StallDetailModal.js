@@ -1,11 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
 export default function StallDetailModal({ visible, onClose, stall, onBook }) {
     if (!stall) return null;
+
+    const handleShare = async () => {
+        try {
+            await Share.share({
+                message: `Check out ${stall.name}!\n\nLocation: Buyuk Chamlija – Socio, Eco, Techno Village\n\n${stall.about}`,
+                title: stall.name,
+            });
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+    };
 
     return (
         <Modal
@@ -25,7 +36,7 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                             <TouchableOpacity style={styles.iconButton} onPress={onClose}>
                                 <Ionicons name="arrow-back" size={24} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.iconButton}>
+                            <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
                                 <Ionicons name="share-social-outline" size={24} color="white" />
                             </TouchableOpacity>
                         </View>

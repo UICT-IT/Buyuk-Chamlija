@@ -1,10 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function AllFestivalsModal({ visible, onClose, festivals, onSelect }) {
     const renderFestivalItem = ({ item }) => (
-        <TouchableOpacity style={styles.festivalCard} onPress={() => onSelect(item)}>
+        <TouchableOpacity
+            style={styles.festivalCard}
+            onPress={() => onSelect(item)}
+            activeOpacity={0.7}
+        >
             <View style={styles.festivalInfo}>
                 <Text style={styles.festivalDateText}>{item.dateTime}</Text>
                 <Text style={styles.festivalTitle}>{item.name}</Text>
