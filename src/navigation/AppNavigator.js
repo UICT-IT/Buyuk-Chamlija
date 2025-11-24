@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '../screens/HomeScreen';
+import FestivalScreen from '../screens/FestivalScreen';
 import ReservationScreen from '../screens/ReservationScreen';
 import InfoScreen from '../screens/InfoScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -25,6 +25,8 @@ function MainTabs({ festivals, activities, faqs }) {
 
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home-outline';
+                    } else if (route.name === 'Festivals') {
+                        iconName = focused ? 'balloon' : 'balloon-outline';
                     } else if (route.name === 'Reservation') {
                         iconName = focused ? 'calendar' : 'calendar-outline';
                     } else if (route.name === 'Info') {
@@ -41,6 +43,9 @@ function MainTabs({ festivals, activities, faqs }) {
         >
             <Tab.Screen name="Home">
                 {props => <HomeScreen {...props} festivals={festivals} />}
+            </Tab.Screen>
+            <Tab.Screen name="Festivals">
+                {props => <FestivalScreen {...props} festivals={festivals} />}
             </Tab.Screen>
             <Tab.Screen name="Reservation">
                 {props => <ReservationScreen {...props} />}

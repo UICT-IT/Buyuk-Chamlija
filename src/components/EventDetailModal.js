@@ -1,12 +1,39 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions, Linking, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+const ITEM_WIDTH = width - 40; // Full width minus container padding (20 left + 20 right)
 
 export default function EventDetailModal({ visible, onClose, event }) {
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(0);
+
     if (!event) return null;
+
+    const handleScroll = (event) => {
+        const scrollPosition = event.nativeEvent.contentOffset.x;
+        const index = Math.round(scrollPosition / ITEM_WIDTH);
+        setActiveIndex(index);
+    };
+
+    const openMaps = () => {
+        const address = encodeURIComponent('Buyuk Chamlija – Socio, Eco, Techno Village');
+        const url = `https://www.google.com/maps/search/?api=1&query=${address}`;
+        Linking.openURL(url);
+    };
+
+    const handleShare = async () => {
+        try {
+            await Share.share({
+                message: `Check out ${event.name}!\n\nDate: ${event.dateTime}\nLocation: Buyuk Chamlija – Socio, Eco, Techno Village\n\n${event.description}`,
+                title: event.name,
+            });
+        } catch (error) {
+            console.error('Error sharing:', error);
+        }
+    };
 
     return (
         <Modal
@@ -32,7 +59,7 @@ export default function EventDetailModal({ visible, onClose, event }) {
                             <TouchableOpacity style={styles.iconButton} onPress={onClose}>
                                 <Ionicons name="arrow-back" size={24} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.iconButton}>
+                            <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
                                 <Ionicons name="share-social-outline" size={24} color="white" />
                             </TouchableOpacity>
                         </View>
@@ -50,16 +77,15 @@ export default function EventDetailModal({ visible, onClose, event }) {
                             <Text style={styles.infoText}>{event.dateTime}</Text>
                         </View>
 
-                        <View style={styles.infoRow}>
+                        <TouchableOpacity style={styles.infoRow} onPress={openMaps}>
                             <View style={styles.iconContainer}>
                                 <Ionicons name="location-outline" size={20} color="tomato" />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.infoText}>{event.venue}</Text>
-                                <Text style={styles.subInfoText}>{event.location}</Text>
+                                <Text style={styles.infoText}>Buyuk Chamlija – Socio, Eco, Techno Village</Text>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color="#ccc" />
-                        </View>
+                        </TouchableOpacity>
 
                         {/* Action Buttons */}
                         <View style={styles.actionButtonsContainer}>
@@ -68,7 +94,7 @@ export default function EventDetailModal({ visible, onClose, event }) {
                                 <Text style={styles.primaryButtonText}>Add to Calendar</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.secondaryButton}>
+                            <TouchableOpacity style={styles.secondaryButton} onPress={openMaps}>
                                 <Ionicons name="map-outline" size={20} color="#333" style={{ marginRight: 8 }} />
                                 <Text style={styles.secondaryButtonText}>View on Map</Text>
                             </TouchableOpacity>
@@ -79,39 +105,88 @@ export default function EventDetailModal({ visible, onClose, event }) {
                             <Text style={styles.sectionTitle}>About the Event</Text>
                             <Text style={styles.description}>
                                 {event.description}
-                                {"\n\n"}
-                                Discover the beauty and intricacy of our community gathering. This event showcases a diverse collection of activities, food stalls, and cultural exhibitions. Join us for a journey through the rich cultural heritage.
                             </Text>
                         </View>
 
                         {/* Gallery Section */}
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Gallery</Text>
-                            <View style={styles.galleryGrid}>
-                                {[1, 2, 3, 4].map((item) => (
-                                    <View key={item} style={styles.galleryItem}>
-                                        <Ionicons name="image" size={32} color="#ccc" />
-                                    </View>
-                                ))}
-                            </View>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.galleryCarousel}
+                                onScroll={handleScroll}
+                                scrollEventThrottle={16}
+                                snapToInterval={ITEM_WIDTH}
+                                decelerationRate="fast"
+                                pagingEnabled
+                            >
+                                {event.gallery && event.gallery.length > 0 ? (
+                                    event.gallery.map((galleryImage, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            onPress={() => setSelectedImage(galleryImage)}
+                                            activeOpacity={0.9}
+                                            style={[styles.galleryItemContainer, { width: ITEM_WIDTH }]}
+                                        >
+                                            <Image
+                                                source={galleryImage}
+                                                style={styles.galleryItem}
+                                                resizeMode="cover"
+                                            />
+                                        </TouchableOpacity>
+                                    ))
+                                ) : (
+                                    [1, 2, 3, 4].map((item) => (
+                                        <View key={item} style={[styles.galleryItem, styles.galleryItemContainer, { width: ITEM_WIDTH, backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}>
+                                            <Ionicons name="image" size={32} color="#ccc" />
+                                        </View>
+                                    ))
+                                )}
+                            </ScrollView>
+
+                            {/* Pagination Dots */}
+                            {event.gallery && event.gallery.length > 1 && (
+                                <View style={styles.paginationContainer}>
+                                    {event.gallery.map((_, index) => (
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.paginationDot,
+                                                index === activeIndex ? styles.paginationDotActive : styles.paginationDotInactive
+                                            ]}
+                                        />
+                                    ))}
+                                </View>
+                            )}
                         </View>
                     </View>
                 </ScrollView>
-
-                {/* Bottom Fixed Section (Review) */}
-                <View style={styles.bottomSection}>
-                    <View style={styles.reviewCard}>
-                        <View style={styles.reviewIconContainer}>
-                            <Ionicons name="chatbubble-outline" size={24} color="tomato" />
-                        </View>
-                        <Text style={styles.reviewTitle}>Enjoyed the event?</Text>
-                        <Text style={styles.reviewSubtitle}>Share your experience with the community by submitting a review.</Text>
-                        <TouchableOpacity style={styles.reviewButton}>
-                            <Text style={styles.reviewButtonText}>Submit a Review</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
             </View>
+
+            {/* Image Viewer Modal */}
+            <Modal
+                visible={!!selectedImage}
+                transparent={true}
+                onRequestClose={() => setSelectedImage(null)}
+                animationType="fade"
+            >
+                <View style={styles.imageViewerContainer}>
+                    <TouchableOpacity
+                        style={styles.imageViewerCloseButton}
+                        onPress={() => setSelectedImage(null)}
+                    >
+                        <Ionicons name="close" size={30} color="white" />
+                    </TouchableOpacity>
+                    {selectedImage && (
+                        <Image
+                            source={selectedImage}
+                            style={styles.fullScreenImage}
+                            resizeMode="contain"
+                        />
+                    )}
+                </View>
+            </Modal>
         </Modal>
     );
 }
@@ -244,67 +319,53 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         fontSize: 15,
     },
-    galleryGrid: {
+    galleryCarousel: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 10,
+    },
+    galleryItemContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     galleryItem: {
-        width: (width - 50) / 2,
-        height: 120,
-        backgroundColor: '#eee',
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    bottomSection: {
-        padding: 20,
-        paddingTop: 0,
-    },
-    reviewCard: {
-        backgroundColor: 'white',
-        borderRadius: 16,
-        padding: 20,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#eee',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    reviewIconContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(255, 99, 71, 0.1)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    reviewTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
-        marginBottom: 8,
-    },
-    reviewSubtitle: {
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 20,
-        lineHeight: 20,
-    },
-    reviewButton: {
-        backgroundColor: 'tomato',
         width: '100%',
-        paddingVertical: 14,
-        borderRadius: 10,
+        height: 250,
+        borderRadius: 12,
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 12,
+        gap: 8,
+    },
+    paginationDot: {
+        height: 8,
+        borderRadius: 4,
+    },
+    paginationDotActive: {
+        backgroundColor: 'tomato',
+        width: 24,
+    },
+    paginationDotInactive: {
+        backgroundColor: '#ddd',
+        width: 8,
+    },
+    imageViewerContainer: {
+        flex: 1,
+        backgroundColor: 'black',
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    reviewButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
+    imageViewerCloseButton: {
+        position: 'absolute',
+        top: 50,
+        right: 20,
+        zIndex: 1,
+        padding: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
+    },
+    fullScreenImage: {
+        width: width,
+        height: '100%',
     },
 });
