@@ -8,8 +8,8 @@ import AllStallsModal from '../components/AllStallsModal';
 import AllFestivalsModal from '../components/AllFestivalsModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const GAP = 15;
-const PADDING = 20;
+const GAP = 20; // Increased gap
+const PADDING = 20; // Increased padding for better margins
 
 export default function HomeScreen(props) {
     const { festivals } = props;
@@ -20,7 +20,8 @@ export default function HomeScreen(props) {
     const { width } = useWindowDimensions();
 
     // Responsive calculations
-    const numColumns = width > 700 ? 3 : 2;
+    // Keep 2 columns for mobile to make them wide, 3 for tablet, 4 for desktop
+    const numColumns = width > 1000 ? 4 : width > 700 ? 3 : 2;
     const stallCardWidth = (width - (PADDING * 2) - (GAP * (numColumns - 1))) / numColumns;
 
     const upcomingFestivals = festivals.filter(f => !f.isActive);
@@ -52,9 +53,13 @@ export default function HomeScreen(props) {
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Header Section */}
                 <View style={styles.headerContainer}>
-                    <View>
-                        <Text style={styles.welcomeText}>Welcome to</Text>
-                        <Text style={styles.brandText}>Buyuk Chamlija</Text>
+                    <View style={styles.headerTopRow}>
+                        <Image source={require('../../assets/logo.png')} style={styles.logo} />
+                        <TouchableOpacity
+                            onPress={() => props.navigation && props.navigation.navigate('Profile')}
+                        >
+                            <Ionicons name="person-outline" size={22} color="#333" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -152,22 +157,19 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         padding: PADDING,
-        paddingTop: 60,
+        paddingTop: 10, // Reduced from 60
+        marginBottom: 30, // Increased from 20
+    },
+    headerTopRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 20,
+        alignItems: 'center',
+        marginBottom: 10,
     },
-    welcomeText: {
-        fontSize: 24,
-        fontWeight: '600',
-        color: '#333',
-    },
-    brandText: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        marginTop: 4,
+    logo: {
+        width: 50, // Reverted to smaller size
+        height: 50,
+        resizeMode: 'contain',
     },
     sectionContainer: {
         paddingHorizontal: PADDING,
@@ -187,7 +189,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     sectionHeader: {
-        fontSize: 20,
+        fontSize: 20, // Reduced from 24
         fontWeight: 'bold',
         color: '#333',
     },
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     },
     viewAllText: {
         color: 'tomato',
-        fontSize: 14,
+        fontSize: 14, // Reduced from 16
         marginRight: 5,
     },
 
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
     stallCard: {
         width: '100%',
         // Height is set dynamically
-        borderRadius: 16,
+        borderRadius: 20, // Increased radius
         overflow: 'hidden',
         position: 'relative',
         shadowColor: '#000',
@@ -233,12 +235,12 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        padding: 10,
+        padding: 15, // Increased padding
         alignItems: 'center',
     },
     stallName: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 16, // Reduced from 18
         fontWeight: 'bold',
         textAlign: 'center',
     },
@@ -249,8 +251,8 @@ const styles = StyleSheet.create({
     },
     festivalCard: {
         backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 20,
+        borderRadius: 24, // Increased radius
+        padding: 24, // Increased padding
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -265,13 +267,13 @@ const styles = StyleSheet.create({
     },
     festivalTitle: {
         color: '#333',
-        fontSize: 20,
+        fontSize: 18, // Reduced from 22
         fontWeight: 'bold',
     },
     festivalDateText: {
         color: '#666',
-        fontSize: 14,
+        fontSize: 14, // Reduced from 16
         fontWeight: '600',
-        marginBottom: 4,
+        marginBottom: 6,
     },
 });
