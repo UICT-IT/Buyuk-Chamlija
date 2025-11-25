@@ -36,15 +36,33 @@ export default function HomeScreen(props) {
     const numColumns = width > 1000 ? 4 : width > 700 ? 3 : 2;
     const stallCardWidth = (width - (PADDING * 2) - (GAP * (numColumns - 1))) / numColumns;
 
-    const upcomingFestivals = festivals.filter(f => !f.isActive);
+    const currentFestival = festivals.find(f => f.isActive) || festivals[0];
 
     const renderFestivalItem = ({ item }) => (
-        <TouchableOpacity style={styles.festivalCard} onPress={() => setSelectedFestival(item)}>
-            <View style={styles.festivalInfo}>
-                <Text style={styles.festivalDateText}>{item.dateTime}</Text>
-                <Text style={styles.festivalTitle}>{item.name}</Text>
+        <TouchableOpacity
+            style={styles.festivalCard}
+            onPress={() => setSelectedFestival(item)}
+            activeOpacity={0.9}
+        >
+            <Image source={item.image} style={styles.festivalCardImage} resizeMode="cover" />
+            <View style={styles.festivalCardOverlay}>
+                <View style={styles.festivalCardHeader}>
+                    {item.isActive && (
+                        <View style={styles.liveBadge}>
+                            <View style={styles.liveDot} />
+                            <Text style={styles.liveText}>LIVE</Text>
+                        </View>
+                    )}
+                </View>
+                <View style={styles.festivalCardContent}>
+                    <Text style={styles.festivalCardTitle}>{item.name}</Text>
+                    <Text style={styles.festivalCardDate}>{item.dateTime}</Text>
+                    <View style={styles.festivalLocationRow}>
+                        <Ionicons name="location-outline" size={16} color="white" />
+                        <Text style={styles.festivalCardLocation}>{item.location}</Text>
+                    </View>
+                </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
         </TouchableOpacity>
     );
 
@@ -75,11 +93,31 @@ export default function HomeScreen(props) {
                     </View>
                 </View>
 
-                {/* Stalls Section */}
+                {/* Upcoming Festivals Section */}
                 <View style={styles.sectionContainer}>
                     {/* Welcome Message */}
                     <Text style={[styles.welcomeMessage, responsiveStyles.welcomeMessage]}>Welcome to{"\n"}Buyuk Chamlija</Text>
 
+                    <View style={styles.sectionHeaderRow}>
+                        <View style={styles.sectionTitleRow}>
+                            <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Festivals</Text>
+                        </View>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllFestivals(true)}>
+                            <Text style={styles.viewAllText}>View All</Text>
+                            <Ionicons name="arrow-forward" size={18} color="tomato" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {currentFestival && (
+                        <View key={currentFestival.id} style={styles.festivalWrapper}>
+                            {renderFestivalItem({ item: currentFestival })}
+                        </View>
+                    )}
+                </View>
+
+                {/* Stalls Section */}
+                <View style={styles.sectionContainer}>
                     <View style={styles.sectionHeaderRow}>
                         <View style={styles.sectionTitleRow}>
                             <Ionicons name="storefront-outline" size={24} color="#333" style={styles.sectionIcon} />
@@ -92,32 +130,12 @@ export default function HomeScreen(props) {
                     </View>
 
                     <View style={styles.stallsGrid}>
-                        {stalls.slice(0, 4).map((stall) => (
+                        {stalls.slice(0, 2).map((stall) => (
                             <View key={stall.id} style={[styles.stallWrapper, { width: stallCardWidth }]}>
                                 {renderStallItem({ item: stall, cardWidth: stallCardWidth })}
                             </View>
                         ))}
                     </View>
-                </View>
-
-                {/* Upcoming Festivals Section */}
-                <View style={styles.sectionContainer}>
-                    <View style={styles.sectionHeaderRow}>
-                        <View style={styles.sectionTitleRow}>
-                            <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
-                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Upcoming Festivals</Text>
-                        </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllFestivals(true)}>
-                            <Text style={styles.viewAllText}>View All</Text>
-                            <Ionicons name="arrow-forward" size={18} color="tomato" />
-                        </TouchableOpacity>
-                    </View>
-
-                    {upcomingFestivals.slice(0, 3).map((festival) => (
-                        <View key={festival.id} style={styles.festivalWrapper}>
-                            {renderFestivalItem({ item: festival })}
-                        </View>
-                    ))}
                 </View>
 
                 {/* Activities Section */}
@@ -133,7 +151,7 @@ export default function HomeScreen(props) {
                         </TouchableOpacity>
                     </View>
 
-                    {activities.slice(0, 2).map((activity) => (
+                    {activities.slice(0, 1).map((activity) => (
                         <View key={activity.id} style={styles.activityCard}>
                             <View style={styles.activityIconContainer}>
                                 <Ionicons name="calendar" size={20} color="tomato" />
@@ -187,7 +205,7 @@ export default function HomeScreen(props) {
             />
             <AllFestivalsModal
                 visible={showAllFestivals}
-                festivals={upcomingFestivals}
+                festivals={festivals}
                 onClose={() => setShowAllFestivals(false)}
                 onSelect={(festival) => {
                     setShowAllFestivals(false);
@@ -307,36 +325,80 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Upcoming Festivals
+    // Festival Card (matching FestivalScreen style)
     festivalWrapper: {
         marginBottom: 15,
     },
     festivalCard: {
+        height: 220,
+        borderRadius: 16,
+        overflow: 'hidden',
         backgroundColor: 'white',
-        borderRadius: 24, // Increased radius
-        padding: 24, // Increased padding
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        shadowRadius: 8,
+        elevation: 4,
     },
-    festivalInfo: {
-        flex: 1,
+    festivalCardImage: {
+        width: '100%',
+        height: '100%',
     },
-    festivalTitle: {
-        color: '#333',
-        fontSize: 18, // Reduced from 22
+    festivalCardOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'space-between',
+        padding: 16,
+    },
+    festivalCardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    liveBadge: {
+        backgroundColor: 'tomato',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    liveDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: 'white',
+        marginRight: 6,
+    },
+    liveText: {
+        color: 'white',
+        fontSize: 12,
         fontWeight: 'bold',
     },
-    festivalDateText: {
-        color: '#666',
-        fontSize: 14, // Reduced from 16
-        fontWeight: '600',
-        marginBottom: 6,
+    festivalCardContent: {
+    },
+    festivalCardTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 4,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10,
+    },
+    festivalCardDate: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.9)',
+        marginBottom: 8,
+        fontWeight: '500',
+    },
+    festivalLocationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    festivalCardLocation: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.9)',
+        marginLeft: 4,
     },
 
     // Activities
