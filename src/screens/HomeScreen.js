@@ -5,7 +5,6 @@ import { stalls, activities } from '../data/mockData';
 import EventDetailModal from '../components/EventDetailModal';
 import StallDetailModal from '../components/StallDetailModal';
 import AllStallsModal from '../components/AllStallsModal';
-import AllFestivalsModal from '../components/AllFestivalsModal';
 import AllActivitiesModal from '../components/AllActivitiesModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,7 +16,6 @@ export default function HomeScreen(props) {
     const [selectedFestival, setSelectedFestival] = useState(null);
     const [selectedStall, setSelectedStall] = useState(null);
     const [showAllStalls, setShowAllStalls] = useState(false);
-    const [showAllFestivals, setShowAllFestivals] = useState(false);
     const [showAllActivities, setShowAllActivities] = useState(false);
     const { width } = useWindowDimensions();
 
@@ -103,7 +101,7 @@ export default function HomeScreen(props) {
                             <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
                             <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Festivals</Text>
                         </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllFestivals(true)}>
+                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => props.navigation?.navigate('Festivals')}>
                             <Text style={styles.viewAllText}>View All</Text>
                             <Ionicons name="arrow-forward" size={18} color="tomato" />
                         </TouchableOpacity>
@@ -203,20 +201,11 @@ export default function HomeScreen(props) {
                     setSelectedStall(stall);
                 }}
             />
-            <AllFestivalsModal
-                visible={showAllFestivals}
-                festivals={festivals}
-                onClose={() => setShowAllFestivals(false)}
-                onSelect={(festival) => {
-                    setShowAllFestivals(false);
-                    setSelectedFestival(festival);
-                }}
-            />
             <AllActivitiesModal
                 visible={showAllActivities}
                 onClose={() => setShowAllActivities(false)}
             />
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 

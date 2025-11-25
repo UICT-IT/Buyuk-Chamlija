@@ -1,30 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { normalizeFestival } from '../utils/normalizeFestival';
 import EventDetailModal from '../components/EventDetailModal';
 
-export default function FestivalScreen({ festivals }) {
-    const [selectedFestival, setSelectedFestival] = React.useState(null);
+export default function FestivalScreen({ festivals, navigation }) {
+    const [selectedFestival, setSelectedFestival] = useState(null);
 
-    // Helper to check if a date is today or in the past/future
-    const isCurrent = (startDate, endDate) => {
-        const now = new Date();
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        // Set end date to end of day
-        end.setHours(23, 59, 59, 999);
-        return now >= start && now <= end;
-    };
+    // Normalize all festivals to ensure safe data structure
+    const normalizedFestivals = festivals.map(normalizeFestival);
 
-    const isUpcoming = (startDate) => {
-        const now = new Date();
-        const start = new Date(startDate);
-        return now < start;
-    };
-
-    const currentFestivals = festivals.filter(f => isCurrent(f.startDate, f.endDate));
-    const upcomingFestivals = festivals.filter(f => isUpcoming(f.startDate));
+    // Filter by isActive flag instead of dates
+    const currentFestivals = normalizedFestivals.filter(f => f.isActive === true);
+    const upcomingFestivals = normalizedFestivals.filter(f => f.isActive === false);
 
     const renderFestivalCard = ({ item, isLive }) => (
         <TouchableOpacity
