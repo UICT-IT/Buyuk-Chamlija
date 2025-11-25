@@ -153,22 +153,72 @@ export const festivals = [
 
 export const stalls = [
   {
+    id: 's2',
+    name: 'Deli Bite',
+    image: require('../../assets/stalls/deli_bite_1.jpg'),
+    about: "DELI BITE is a big happy breath of fresh air! Nestled on a beautiful farm in Pretoria, we're the perfect family-friendly spot where kids can run free under huge open skies. Come hungry – we dish up the tastiest deli classics and proper hearty favorites, all made with the freshest local and organic ingredients, plus our very own farm-to-table meats and juicy patties made right here on the farm! Pack the family and spend the whole day: kick off with a generous farm-style breakfast or swing by for a laid-back deli lunch. There's loads of space to play, laugh, and make memories. At Deli Bite everyone's welcome, the food is real, the vibe is joyful, and the meat is proudly made by us – come join the fun!",
+    gallery: [
+      require('../../assets/stalls/deli_bite_1.jpg'),
+      require('../../assets/stalls/deli_bite_2.jpg'),
+      require('../../assets/stalls/deli_bite_3.jpg'),
+      require('../../assets/stalls/deli_bite_4.jpg'),
+      require('../../assets/stalls/deli_bite_5.jpg'),
+    ],
+    bookable: false,
+  },
+  {
+    id: 's4',
+    name: 'Afro Lato',
+    image: require('../../assets/stalls/afro_lato_1.jpg'),
+    about: "Welcome to Afro Lato – your happy farm ice-cream escape!\nEndless Pretoria skies, the smell of fresh cream in the air, and a bright little stall overflowing with handmade ice cream that tastes like pure sunshine.\nWe churn every small batch right here using fresh farm dairy and the season’s ripest fruit, nuts and home-grown flavors. One scoop and the kids are beaming, the grown-ups are smiling wide, and the whole day feels like a holiday.\nGrab a cone (or three), find your spot, and let the good times melt in your mouth. This isn’t just ice cream; it’s slow licks, sticky fingers, big laughs and the sweetest farm memories.\nAfro Lato: real farm, real cream, ridiculously happy ice cream. We’ll save you a scoop!",
+    gallery: [
+      require('../../assets/stalls/afro_lato_1.jpg'),
+      require('../../assets/stalls/afro_lato_2.png'),
+      require('../../assets/stalls/afro_lato_3.jpg'),
+      require('../../assets/stalls/afro_lato_4.jpg'),
+    ],
+    bookable: false,
+  },
+  {
     id: 's1',
     name: 'The Barn',
     image: require('../../assets/stalls/The Barn.jpg'),
     about: "Wouldn't you like to turn your wedding celebrations into an unforgettable memory? The Barn is the perfect place for you.",
-  },
-  {
-    id: 's2',
-    name: 'Deli Bite',
-    image: require('../../assets/stalls/Deli Bite.jpg'),
-    about: "Experience authentic flavors in a unique setting. Deli Bite offers a delightful culinary journey with fresh ingredients and traditional recipes.",
+    bookable: true,
   },
   {
     id: 's3',
     name: 'Karinja Cafe',
     image: require('../../assets/stalls/KarinjaCafe.jpg'),
     about: "Karinja Cafe attracts attention with its design reminiscent of an ant nest. You can find the unique flavors of Turkish cuisine. Reserve your spot now!",
+    bookable: false,
+  },
+  {
+    id: 's5',
+    name: 'Country Bazaar',
+    image: require('../../assets/stalls/country_bazaar_4.jpg'),
+    about: "Country Bazaar in Centurion, South Africa, offers a unique farm shop experience. Discover organic produce and authentic farm goods in a welcoming atmosphere. With friendly staff and wheelchair-accessible facilities, it's a must-visit destination for those seeking quality products. Enjoy a day out with the family at the play areas and animal farm, where kids can interact with animals and have fun with toys and games. Explore this privately held facility and indulge in a farm-to-table experience unlike any other in the province.",
+    gallery: [
+      require('../../assets/stalls/country_bazaar_1.jpg'),
+      require('../../assets/stalls/country_bazaar_2.jpg'),
+      require('../../assets/stalls/country_bazaar_3.jpg'),
+      require('../../assets/stalls/country_bazaar_4.jpg'),
+    ],
+    bookable: false,
+  },
+  {
+    id: 's6',
+    name: 'ÇAYHANE',
+    image: require('../../assets/stalls/cayhane_3.jpg'),
+    about: "Experience the warmth of Turkish culture at Çayhane in Centurion.\nStep into our inviting Turkish tea house, where the samovar is always simmering and the aroma of freshly brewed çay fills the air.\nEnjoy endless glasses of traditional Turkish tea served the proper way—deep ruby-red, perfectly steeped, and paired with classic accompaniments: golden borek, simit and sweet bites of baklava and lokum.\nOpen from early breakfast through late dinner, Çayhane is the perfect spot to linger with friends, catch up over a quiet cup, or gather the whole family. Dine in, take away, or order delivery—our çay and hospitality travel well.\nCome, sit, sip, and let the day slow down. Çayhane – where every glass feels like home",
+    gallery: [
+      require('../../assets/stalls/cayhane_1.jpg'),
+      require('../../assets/stalls/cayhane_2.jpg'),
+      require('../../assets/stalls/cayhane_3.jpg'),
+      require('../../assets/stalls/cayhane_4.jpg'),
+      require('../../assets/stalls/cayhane_5.jpg'),
+    ],
+    bookable: false,
   },
 ];
 

@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
+const ITEM_WIDTH = width - 40; // Full width minus container padding
 
 export default function StallDetailModal({ visible, onClose, stall, onBook }) {
+    const [activeIndex, setActiveIndex] = useState(0);
+
     if (!stall) return null;
+
+    const handleScroll = (event) => {
+        const scrollPosition = event.nativeEvent.contentOffset.x;
+        const index = Math.round(scrollPosition / ITEM_WIDTH);
+        setActiveIndex(index);
+    };
 
     const handleShare = async () => {
         try {
@@ -55,27 +64,62 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                         </View>
 
                         {/* Gallery Section */}
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Gallery</Text>
-                            <View style={styles.galleryGrid}>
-                                {[1, 2, 3, 4].map((item) => (
-                                    <View key={item} style={styles.galleryItem}>
-                                        <Ionicons name="image" size={32} color="#ccc" />
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
+                        {stall.gallery && stall.gallery.length > 0 && (
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Gallery</Text>
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={styles.galleryCarousel}
+                                    onScroll={handleScroll}
+                                    scrollEventThrottle={16}
+                                    snapToInterval={ITEM_WIDTH}
+                                    decelerationRate="fast"
+                                    pagingEnabled
+                                >
+                                    {stall.gallery.map((galleryImage, index) => (
+                                        <View
+                                            key={index}
+                                            style={[styles.galleryItemContainer, { width: ITEM_WIDTH }]}
+                                        >
+                                            <Image
+                                                source={galleryImage}
+                                                style={styles.galleryItem}
+                                                resizeMode="cover"
+                                            />
+                                        </View>
+                                    ))}
+                                </ScrollView>
 
-                        {/* Book Button */}
-                        <TouchableOpacity
-                            style={styles.bookButton}
-                            onPress={() => {
-                                onClose();
-                                onBook(stall);
-                            }}
-                        >
-                            <Text style={styles.bookButtonText}>Book Reservation</Text>
-                        </TouchableOpacity>
+                                {/* Pagination Dots */}
+                                {stall.gallery.length > 1 && (
+                                    <View style={styles.paginationContainer}>
+                                        {stall.gallery.map((_, index) => (
+                                            <View
+                                                key={index}
+                                                style={[
+                                                    styles.paginationDot,
+                                                    index === activeIndex ? styles.paginationDotActive : styles.paginationDotInactive
+                                                ]}
+                                            />
+                                        ))}
+                                    </View>
+                                )}
+                            </View>
+                        )}
+
+                        {/* Book Button - Only for bookable stalls */}
+                        {stall.bookable && (
+                            <TouchableOpacity
+                                style={styles.bookButton}
+                                onPress={() => {
+                                    onClose();
+                                    onBook(stall);
+                                }}
+                            >
+                                <Text style={styles.bookButtonText}>Book Reservation</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </ScrollView>
             </View>
@@ -142,18 +186,35 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         fontSize: 16,
     },
-    galleryGrid: {
+    galleryCarousel: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 10,
     },
-    galleryItem: {
-        width: (width - 50) / 2,
-        height: 120,
-        backgroundColor: '#eee',
-        borderRadius: 12,
+    galleryItemContainer: {
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    galleryItem: {
+        width: '100%',
+        height: 250,
+        borderRadius: 12,
+    },
+    paginationContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 12,
+        gap: 8,
+    },
+    paginationDot: {
+        height: 8,
+        borderRadius: 4,
+    },
+    paginationDotActive: {
+        backgroundColor: 'tomato',
+        width: 24,
+    },
+    paginationDotInactive: {
+        backgroundColor: '#ddd',
+        width: 8,
     },
     bookButton: {
         backgroundColor: 'tomato',
