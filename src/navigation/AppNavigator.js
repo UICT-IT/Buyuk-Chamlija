@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
+import EventDetailScreen from '../screens/EventDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -65,6 +66,7 @@ export default function AppNavigator({ festivals, activities, faqs }) {
                 <Stack.Screen name="Main">
                     {props => <MainTabs {...props} festivals={festivals} activities={activities} faqs={faqs} />}
                 </Stack.Screen>
+                <Stack.Screen name="EventDetail" component={EventDetailScreen} />
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Signup" component={SignupScreen} />
             </Stack.Navigator>

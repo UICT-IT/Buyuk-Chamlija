@@ -69,12 +69,18 @@ export default function EventDetailModal({ visible, onClose, event }) {
                         {/* Title */}
                         <Text style={styles.title}>{event.name}</Text>
 
-                        {/* Info Rows */}
                         <View style={styles.infoRow}>
                             <View style={styles.iconContainer}>
                                 <Ionicons name="calendar-outline" size={20} color="tomato" />
                             </View>
                             <Text style={styles.infoText}>{event.dateTime}</Text>
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="time-outline" size={20} color="tomato" />
+                            </View>
+                            <Text style={styles.infoText}>{event.operatingHours || '09:00 AM - 09:00 PM'}</Text>
                         </View>
 
                         <TouchableOpacity style={styles.infoRow} onPress={openMaps}>
@@ -87,16 +93,24 @@ export default function EventDetailModal({ visible, onClose, event }) {
                             <Ionicons name="chevron-forward" size={20} color="#ccc" />
                         </TouchableOpacity>
 
+                        {/* Entrance Fee Row */}
+                        <View style={styles.infoRow}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="ticket-outline" size={20} color="tomato" />
+                            </View>
+                            <View>
+                                <Text style={styles.infoText}>Entrance Fee</Text>
+                                <Text style={styles.subInfoText}>
+                                    Adults: {event.entranceFeeAdult || 'R50'} • Kids: {event.entranceFeeChild || 'R25'}
+                                </Text>
+                            </View>
+                        </View>
+
                         {/* Action Buttons */}
                         <View style={styles.actionButtonsContainer}>
-                            <TouchableOpacity style={styles.primaryButton}>
-                                <Ionicons name="add" size={20} color="white" style={{ marginRight: 8 }} />
-                                <Text style={styles.primaryButtonText}>Add to Calendar</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity style={styles.secondaryButton} onPress={openMaps}>
-                                <Ionicons name="map-outline" size={20} color="#333" style={{ marginRight: 8 }} />
-                                <Text style={styles.secondaryButtonText}>View on Map</Text>
+                            <TouchableOpacity style={styles.primaryButton} onPress={openMaps}>
+                                <Ionicons name="map-outline" size={20} color="white" style={{ marginRight: 8 }} />
+                                <Text style={styles.primaryButtonText}>View on Map</Text>
                             </TouchableOpacity>
                         </View>
 
