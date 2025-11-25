@@ -7,14 +7,16 @@ import { stalls } from '../data/mockData';
 export default function AllStallsModal({ visible, onClose, onSelect }) {
     const renderStallItem = ({ item }) => (
         <TouchableOpacity
-            style={styles.stallCard}
+            style={styles.card}
             onPress={() => onSelect(item)}
-            activeOpacity={0.7}
+            activeOpacity={0.9}
         >
-            <Image source={item.image} style={styles.stallImage} />
-            <View style={styles.stallInfo}>
-                <Text style={styles.stallName}>{item.name}</Text>
-                <Text style={styles.stallDescription} numberOfLines={2}>{item.about}</Text>
+            <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
+            <View style={styles.cardOverlay}>
+                <View style={styles.cardContent}>
+                    <Text style={styles.cardTitle}>{item.name}</Text>
+                    <Text style={styles.cardDescription} numberOfLines={2}>{item.about}</Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -50,7 +52,7 @@ export default function AllStallsModal({ visible, onClose, onSelect }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f8f9fa',
     },
     header: {
         flexDirection: 'row',
@@ -65,42 +67,55 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#1a1a1a',
     },
     closeButton: {
         padding: 4,
     },
     listContent: {
         padding: 20,
+        paddingBottom: 40,
     },
-    stallCard: {
-        backgroundColor: 'white',
+    card: {
+        height: 220,
         borderRadius: 16,
-        marginBottom: 20,
         overflow: 'hidden',
+        marginBottom: 16,
+        backgroundColor: 'white',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        shadowRadius: 8,
+        elevation: 4,
     },
-    stallImage: {
+    cardImage: {
         width: '100%',
-        height: 200,
-        resizeMode: 'cover',
+        height: '100%',
     },
-    stallInfo: {
-        padding: 15,
+    cardOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'flex-end',
+        padding: 16,
     },
-    stallName: {
-        fontSize: 18,
+    cardContent: {
+        // Container for text
+    },
+    cardTitle: {
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 8,
+        color: 'white',
+        marginBottom: 4,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10
     },
-    stallDescription: {
+    cardDescription: {
         fontSize: 14,
-        color: '#666',
-        lineHeight: 20,
+        color: 'rgba(255,255,255,0.9)',
+        fontWeight: '500',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10
     },
 });
