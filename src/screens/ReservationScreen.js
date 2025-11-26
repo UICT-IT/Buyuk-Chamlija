@@ -17,8 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { stalls } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
 
-export default function ReservationScreen({ route }) {
+export default function ReservationScreen({ route, navigation }) {
+    const { user } = useAuth();
+
+    // Filter to only show bookable stalls (The Barn)
+    const bookableStalls = stalls.filter(stall => stall.bookable === true);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -122,142 +127,167 @@ export default function ReservationScreen({ route }) {
             >
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Table Reservation</Text>
-                        <Text style={styles.headerSubtitle}>Book your spot at our restaurant</Text>
+                        <Text style={styles.headerTitle}>Wedding Reservation</Text>
+                        <Text style={styles.headerSubtitle}>Book your special day at The Barn</Text>
                     </View>
 
-                    <View style={styles.formContainer}>
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Select a Stall *</Text>
-                            <TouchableOpacity
-                                style={styles.dropdownTrigger}
-                                onPress={() => setIsStallModalVisible(true)}
-                            >
-                                <Text style={[styles.dropdownText, !selectedStall && styles.placeholderText]}>
-                                    {selectedStall ? selectedStall.name : 'Choose a stall...'}
-                                </Text>
-                                <Ionicons name="chevron-down" size={20} color="gray" />
+                    {/* Guest User Prompt */}
+                    {!user ? (
+                        <View style={styles.guestPromptContainer}>
+                            <Ionicons name="lock-closed-outline" size={60} color="tomato" />
+                            <Text style={styles.guestPromptTitle}>Login Required</Text>
+                            <Text style={styles.guestPromptMessage}>
+                                Please log in to make a wedding reservation at The Barn
+                            </Text>
+                            <View style={styles.authButtonsRow}>
+                                <TouchableOpacity
+                                    style={[styles.authButton, styles.loginButton]}
+                                    onPress={() => navigation.navigate('Login')}
+                                >
+                                    <Text style={styles.loginButtonText}>Log In</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.authButton, styles.signupButton]}
+                                    onPress={() => navigation.navigate('Signup')}
+                                >
+                                    <Text style={styles.signupButtonText}>Sign Up</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    ) : (
+                        <View style={styles.formContainer}>
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Select a Stall *</Text>
+                                <TouchableOpacity
+                                    style={styles.dropdownTrigger}
+                                    onPress={() => setIsStallModalVisible(true)}
+                                >
+                                    <Text style={[styles.dropdownText, !selectedStall && styles.placeholderText]}>
+                                        {selectedStall ? selectedStall.name : 'Choose a stall...'}
+                                    </Text>
+                                    <Ionicons name="chevron-down" size={20} color="gray" />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Full Name *</Text>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="person-outline" size={20} color="gray" style={styles.icon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="John Doe"
+                                        value={formData.name}
+                                        onChangeText={(text) => handleInputChange('name', text)}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Email Address *</Text>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="mail-outline" size={20} color="gray" style={styles.icon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="john@example.com"
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        value={formData.email}
+                                        onChangeText={(text) => handleInputChange('email', text)}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Phone Number *</Text>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="call-outline" size={20} color="gray" style={styles.icon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="+1 234 567 8900"
+                                        keyboardType="phone-pad"
+                                        value={formData.phone}
+                                        onChangeText={(text) => handleInputChange('phone', text)}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.row}>
+                                <View style={[styles.inputGroup, styles.halfWidth]}>
+                                    <Text style={styles.label}>Date *</Text>
+                                    <TouchableOpacity style={styles.inputWrapper} onPress={showDatepicker}>
+                                        <Ionicons name="calendar-outline" size={20} color="gray" style={styles.icon} />
+                                        <Text style={styles.input}>
+                                            {formData.date.toLocaleDateString()}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {showDatePicker && (
+                                        <DateTimePicker
+                                            testID="dateTimePicker"
+                                            value={formData.date}
+                                            mode="date"
+                                            is24Hour={true}
+                                            display="default"
+                                            onChange={onDateChange}
+                                            minimumDate={new Date()}
+                                        />
+                                    )}
+                                </View>
+
+                                <View style={[styles.inputGroup, styles.halfWidth]}>
+                                    <Text style={styles.label}>Time *</Text>
+                                    <TouchableOpacity style={styles.inputWrapper} onPress={showTimepicker}>
+                                        <Ionicons name="time-outline" size={20} color="gray" style={styles.icon} />
+                                        <Text style={styles.input}>
+                                            {formData.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {showTimePicker && (
+                                        <DateTimePicker
+                                            testID="timePicker"
+                                            value={formData.time}
+                                            mode="time"
+                                            is24Hour={true}
+                                            display="default"
+                                            onChange={onTimeChange}
+                                        />
+                                    )}
+                                </View>
+                            </View>
+
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Number of Guests *</Text>
+                                <View style={styles.inputWrapper}>
+                                    <Ionicons name="people-outline" size={20} color="gray" style={styles.icon} />
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="2"
+                                        keyboardType="numeric"
+                                        value={formData.guests}
+                                        onChangeText={(text) => handleInputChange('guests', text)}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Special Requests</Text>
+                                <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
+                                    <TextInput
+                                        style={[styles.input, styles.textArea]}
+                                        placeholder="Any allergies or special occasions?"
+                                        multiline
+                                        numberOfLines={4}
+                                        value={formData.requests}
+                                        onChangeText={(text) => handleInputChange('requests', text)}
+                                        textAlignVertical="top"
+                                    />
+                                </View>
+                            </View>
+
+                            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                                <Text style={styles.submitButtonText}>Reserve Now</Text>
                             </TouchableOpacity>
                         </View>
-
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Full Name *</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="person-outline" size={20} color="gray" style={styles.icon} />
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="John Doe"
-                                    value={formData.name}
-                                    onChangeText={(text) => handleInputChange('name', text)}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Email Address *</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="mail-outline" size={20} color="gray" style={styles.icon} />
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="john@example.com"
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    value={formData.email}
-                                    onChangeText={(text) => handleInputChange('email', text)}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Phone Number *</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="call-outline" size={20} color="gray" style={styles.icon} />
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="+1 234 567 8900"
-                                    keyboardType="phone-pad"
-                                    value={formData.phone}
-                                    onChangeText={(text) => handleInputChange('phone', text)}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={styles.row}>
-                            <View style={[styles.inputGroup, styles.halfWidth]}>
-                                <Text style={styles.label}>Date *</Text>
-                                <TouchableOpacity style={styles.inputWrapper} onPress={showDatepicker}>
-                                    <Ionicons name="calendar-outline" size={20} color="gray" style={styles.icon} />
-                                    <Text style={styles.input}>
-                                        {formData.date.toLocaleDateString()}
-                                    </Text>
-                                </TouchableOpacity>
-                                {showDatePicker && (
-                                    <DateTimePicker
-                                        testID="dateTimePicker"
-                                        value={formData.date}
-                                        mode="date"
-                                        is24Hour={true}
-                                        display="default"
-                                        onChange={onDateChange}
-                                        minimumDate={new Date()}
-                                    />
-                                )}
-                            </View>
-
-                            <View style={[styles.inputGroup, styles.halfWidth]}>
-                                <Text style={styles.label}>Time *</Text>
-                                <TouchableOpacity style={styles.inputWrapper} onPress={showTimepicker}>
-                                    <Ionicons name="time-outline" size={20} color="gray" style={styles.icon} />
-                                    <Text style={styles.input}>
-                                        {formData.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </Text>
-                                </TouchableOpacity>
-                                {showTimePicker && (
-                                    <DateTimePicker
-                                        testID="timePicker"
-                                        value={formData.time}
-                                        mode="time"
-                                        is24Hour={true}
-                                        display="default"
-                                        onChange={onTimeChange}
-                                    />
-                                )}
-                            </View>
-                        </View>
-
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Number of Guests *</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="people-outline" size={20} color="gray" style={styles.icon} />
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="2"
-                                    keyboardType="numeric"
-                                    value={formData.guests}
-                                    onChangeText={(text) => handleInputChange('guests', text)}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Special Requests</Text>
-                            <View style={[styles.inputWrapper, styles.textAreaWrapper]}>
-                                <TextInput
-                                    style={[styles.input, styles.textArea]}
-                                    placeholder="Any allergies or special occasions?"
-                                    multiline
-                                    numberOfLines={4}
-                                    value={formData.requests}
-                                    onChangeText={(text) => handleInputChange('requests', text)}
-                                    textAlignVertical="top"
-                                />
-                            </View>
-                        </View>
-
-                        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                            <Text style={styles.submitButtonText}>Reserve Now</Text>
-                        </TouchableOpacity>
-                    </View>
+                    )}
                 </ScrollView>
             </KeyboardAvoidingView>
 
@@ -271,13 +301,13 @@ export default function ReservationScreen({ route }) {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Select a Stall</Text>
+                            <Text style={styles.modalTitle}>Select Wedding Venue</Text>
                             <TouchableOpacity onPress={() => setIsStallModalVisible(false)}>
                                 <Ionicons name="close" size={24} color="#333" />
                             </TouchableOpacity>
                         </View>
                         <FlatList
-                            data={stalls}
+                            data={bookableStalls}
                             renderItem={renderStallItem}
                             keyExtractor={item => item.id}
                             contentContainerStyle={styles.modalList}
@@ -446,5 +476,62 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         flex: 1,
+    },
+    // Guest Prompt Styles
+    guestPromptContainer: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 40,
+        margin: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    guestPromptTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+        marginTop: 20,
+        marginBottom: 10,
+    },
+    guestPromptMessage: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 30,
+        lineHeight: 24,
+    },
+    authButtonsRow: {
+        flexDirection: 'row',
+        gap: 10,
+        width: '100%',
+    },
+    authButton: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loginButton: {
+        backgroundColor: 'white',
+        borderWidth: 2,
+        borderColor: 'tomato',
+    },
+    signupButton: {
+        backgroundColor: 'tomato',
+    },
+    loginButtonText: {
+        color: 'tomato',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    signupButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
 });

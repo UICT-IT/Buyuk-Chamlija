@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
-export default function ProfileScreen({ navigation }) {
-    const [isNotificationsEnabled, setIsNotificationsEnabled] = React.useState(true);
+export default function ProfileScreen({ navigation, faqs }) {
     const { user, logout } = useAuth();
 
     const handleLogout = () => {
@@ -96,24 +95,19 @@ export default function ProfileScreen({ navigation }) {
                     </View>
                 )}
 
-                {/* Settings Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionHeader}>Settings</Text>
-                    <View style={styles.settingsCard}>
-                        {renderSettingItem('notifications-outline', 'Notifications', false,
-                            <Switch
-                                value={isNotificationsEnabled}
-                                onValueChange={setIsNotificationsEnabled}
-                                trackColor={{ false: "#767577", true: "tomato" }}
-                                thumbColor={isNotificationsEnabled ? "#fff" : "#f4f3f4"}
-                            />
-                        )}
-                        <View style={styles.divider} />
-                        {renderSettingItem('language-outline', 'Language')}
-                        <View style={styles.divider} />
-                        {renderSettingItem('help-circle-outline', 'Help & Support')}
+                {/* FAQ Button */}
+                <TouchableOpacity
+                    style={styles.faqButton}
+                    onPress={() => navigation.navigate('FAQ')}
+                >
+                    <View style={styles.faqButtonContent}>
+                        <View style={styles.faqButtonLeft}>
+                            <Ionicons name="help-circle-outline" size={24} color="tomato" />
+                            <Text style={styles.faqButtonText}>Frequently Asked Questions</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color="tomato" />
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 {/* Logout Button - Only for Logged In Users */}
                 {user && (
@@ -333,5 +327,33 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    // FAQ Button Styles
+    faqButton: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    faqButtonContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 18,
+    },
+    faqButtonLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    faqButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+        marginLeft: 15,
     },
 });
