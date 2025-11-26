@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Image, Dimensions, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const ITEM_WIDTH = width - 40; // Full width minus container padding
 
-export default function StallDetailModal({ visible, onClose, stall, onBook }) {
+export default function ActivityDetailModal({ visible, onClose, activity }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [fullScreenImage, setFullScreenImage] = useState(null);
 
-    if (!stall) return null;
+    if (!activity) return null;
 
     const handleScroll = (event) => {
         const scrollPosition = event.nativeEvent.contentOffset.x;
@@ -20,8 +21,8 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
     const handleShare = async () => {
         try {
             await Share.share({
-                message: `Check out ${stall.name}!\n\nLocation: Buyuk Chamlija – Socio, Eco, Techno Village\n\n${stall.about}`,
-                title: stall.name,
+                message: `Check out ${activity.name}!\n\nTime: ${activity.startTime}\nLocation: ${activity.location}\n\n${activity.about}`,
+                title: activity.name,
             });
         } catch (error) {
             console.error('Error sharing:', error);
@@ -39,7 +40,7 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     {/* Header Image Section */}
                     <View style={styles.imageContainer}>
-                        <Image source={stall.image} style={styles.stallImage} />
+                        <Image source={activity.image} style={styles.activityImage} />
 
                         {/* Header Buttons */}
                         <View style={styles.headerButtons}>
@@ -54,18 +55,33 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
 
                     <View style={styles.contentContainer}>
                         {/* Title */}
-                        <Text style={styles.title}>{stall.name}</Text>
+                        <Text style={styles.title}>{activity.name}</Text>
+
+                        {/* Info Rows */}
+                        <View style={styles.infoRow}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="time-outline" size={20} color="tomato" />
+                            </View>
+                            <Text style={styles.infoText}>{activity.startTime}</Text>
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="location-outline" size={20} color="tomato" />
+                            </View>
+                            <Text style={styles.infoText}>{activity.location}</Text>
+                        </View>
 
                         {/* About Section */}
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>About the Stall</Text>
+                            <Text style={styles.sectionTitle}>About the Activity</Text>
                             <Text style={styles.description}>
-                                {stall.about}
+                                {activity.about}
                             </Text>
                         </View>
 
                         {/* Gallery Section */}
-                        {stall.gallery && stall.gallery.length > 0 && (
+                        {activity.gallery && activity.gallery.length > 0 && (
                             <View style={styles.section}>
                                 <Text style={styles.sectionTitle}>Gallery</Text>
                                 <ScrollView
@@ -78,7 +94,7 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                                     decelerationRate="fast"
                                     pagingEnabled
                                 >
-                                    {stall.gallery.map((galleryImage, index) => (
+                                    {activity.gallery.map((galleryImage, index) => (
                                         <TouchableOpacity
                                             key={index}
                                             style={[styles.galleryItemContainer, { width: ITEM_WIDTH }]}
@@ -95,9 +111,9 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                                 </ScrollView>
 
                                 {/* Pagination Dots */}
-                                {stall.gallery.length > 1 && (
+                                {activity.gallery.length > 1 && (
                                     <View style={styles.paginationContainer}>
-                                        {stall.gallery.map((_, index) => (
+                                        {activity.gallery.map((_, index) => (
                                             <View
                                                 key={index}
                                                 style={[
@@ -109,19 +125,6 @@ export default function StallDetailModal({ visible, onClose, stall, onBook }) {
                                     </View>
                                 )}
                             </View>
-                        )}
-
-                        {/* Book Button - Only for bookable stalls */}
-                        {stall.bookable && (
-                            <TouchableOpacity
-                                style={styles.bookButton}
-                                onPress={() => {
-                                    onClose();
-                                    onBook(stall);
-                                }}
-                            >
-                                <Text style={styles.bookButtonText}>Book Reservation</Text>
-                            </TouchableOpacity>
                         )}
                     </View>
                 </ScrollView>
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
         width: '100%',
         position: 'relative',
     },
-    stallImage: {
+    activityImage: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
@@ -199,8 +202,37 @@ const styles = StyleSheet.create({
         color: '#1a1a1a',
         marginBottom: 20,
     },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        backgroundColor: 'white',
+        padding: 12,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    iconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255, 99, 71, 0.1)', // Tomato tint
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
+    },
+    infoText: {
+        color: '#333',
+        fontSize: 16,
+        fontWeight: '500',
+        flex: 1, // Allow text to wrap
+    },
     section: {
         marginBottom: 30,
+        marginTop: 10,
     },
     sectionTitle: {
         fontSize: 20,
@@ -242,24 +274,6 @@ const styles = StyleSheet.create({
     paginationDotInactive: {
         backgroundColor: '#ddd',
         width: 8,
-    },
-    bookButton: {
-        backgroundColor: 'tomato',
-        paddingVertical: 16,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 20,
-        shadowColor: 'tomato',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    bookButtonText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
     // Full Screen Image Styles
     fullScreenContainer: {

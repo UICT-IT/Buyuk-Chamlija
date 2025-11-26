@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { activities } from '../data/mockData';
+import ActivityDetailModal from './ActivityDetailModal';
 
 export default function AllActivitiesModal({ visible, onClose }) {
+    const [selectedActivity, setSelectedActivity] = useState(null);
+
     return (
         <Modal
             visible={visible}
@@ -23,7 +26,12 @@ export default function AllActivitiesModal({ visible, onClose }) {
 
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     {activities.map((activity) => (
-                        <View key={activity.id} style={styles.activityCard}>
+                        <TouchableOpacity
+                            key={activity.id}
+                            style={styles.activityCard}
+                            onPress={() => setSelectedActivity(activity)}
+                            activeOpacity={0.7}
+                        >
                             <View style={styles.activityIconContainer}>
                                 <Ionicons name="calendar" size={20} color="tomato" />
                             </View>
@@ -43,9 +51,15 @@ export default function AllActivitiesModal({ visible, onClose }) {
                             <View style={styles.activityCategoryBadge}>
                                 <Text style={styles.activityCategoryText}>{activity.category}</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
+
+                <ActivityDetailModal
+                    visible={!!selectedActivity}
+                    activity={selectedActivity}
+                    onClose={() => setSelectedActivity(null)}
+                />
             </SafeAreaView>
         </Modal>
     );
@@ -100,6 +114,7 @@ const styles = StyleSheet.create({
     },
     activityInfo: {
         flex: 1,
+        marginRight: 8,
     },
     activityName: {
         fontSize: 16,
@@ -108,23 +123,25 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     activityDetails: {
-        flexDirection: 'row',
-        gap: 12,
+        flexDirection: 'column',
+        gap: 4,
     },
     activityDetailItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 6,
     },
     activityDetailText: {
         fontSize: 12,
         color: '#666',
+        flex: 1,
     },
     activityCategoryBadge: {
         backgroundColor: 'rgba(255, 99, 71, 0.1)',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 12,
+        alignSelf: 'flex-start',
     },
     activityCategoryText: {
         fontSize: 12,
