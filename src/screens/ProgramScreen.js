@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Switch } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Switch, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ActivityDetailModal from '../components/ActivityDetailModal';
 
 export default function ProgramScreen({ activities }) {
   const [showKidsOnly, setShowKidsOnly] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
 
   const filteredActivities = showKidsOnly
     ? activities.filter(a => a.category === 'Kids')
     : activities;
 
   const renderActivityItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => setSelectedActivity(item)}
+      activeOpacity={0.7}
+    >
       <View style={styles.timeContainer}>
         <Text style={styles.timeText}>{item.startTime}</Text>
       </View>
@@ -19,7 +25,7 @@ export default function ProgramScreen({ activities }) {
         <Text style={styles.itemLocation}>{item.location}</Text>
         <Text style={styles.itemCategory}>{item.category}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -43,6 +49,12 @@ export default function ProgramScreen({ activities }) {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={<Text style={styles.emptyText}>No activities found.</Text>}
+      />
+
+      <ActivityDetailModal
+        visible={!!selectedActivity}
+        activity={selectedActivity}
+        onClose={() => setSelectedActivity(null)}
       />
     </SafeAreaView>
   );
@@ -82,6 +94,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   timeContainer: {
     marginRight: 15,

@@ -6,6 +6,7 @@ import EventDetailModal from '../components/EventDetailModal';
 import StallDetailModal from '../components/StallDetailModal';
 import AllStallsModal from '../components/AllStallsModal';
 import AllActivitiesModal from '../components/AllActivitiesModal';
+import ActivityDetailModal from '../components/ActivityDetailModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const GAP = 20; // Increased gap
@@ -15,6 +16,7 @@ export default function HomeScreen(props) {
     const { festivals } = props;
     const [selectedFestival, setSelectedFestival] = useState(null);
     const [selectedStall, setSelectedStall] = useState(null);
+    const [selectedActivity, setSelectedActivity] = useState(null);
     const [showAllStalls, setShowAllStalls] = useState(false);
     const [showAllActivities, setShowAllActivities] = useState(false);
     const { width } = useWindowDimensions();
@@ -149,8 +151,13 @@ export default function HomeScreen(props) {
                         </TouchableOpacity>
                     </View>
 
-                    {activities.slice(0, 1).map((activity) => (
-                        <View key={activity.id} style={styles.activityCard}>
+                    {activities.slice(0, 2).map((activity) => (
+                        <TouchableOpacity
+                            key={activity.id}
+                            style={styles.activityCard}
+                            onPress={() => setSelectedActivity(activity)}
+                            activeOpacity={0.7}
+                        >
                             <View style={styles.activityIconContainer}>
                                 <Ionicons name="calendar" size={20} color="tomato" />
                             </View>
@@ -170,7 +177,7 @@ export default function HomeScreen(props) {
                             <View style={styles.activityCategoryBadge}>
                                 <Text style={styles.activityCategoryText}>{activity.category}</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
             </ScrollView>
@@ -192,6 +199,11 @@ export default function HomeScreen(props) {
                         props.navigation.navigate('Reservation', { stallId: stall.id });
                     }
                 }}
+            />
+            <ActivityDetailModal
+                visible={!!selectedActivity}
+                activity={selectedActivity}
+                onClose={() => setSelectedActivity(null)}
             />
             <AllStallsModal
                 visible={showAllStalls}
@@ -383,11 +395,13 @@ const styles = StyleSheet.create({
     festivalLocationRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 4, // Added margin
     },
     festivalCardLocation: {
         fontSize: 14,
         color: 'rgba(255,255,255,0.9)',
         marginLeft: 4,
+        flex: 1, // Allow text to wrap/shrink
     },
 
     // Activities
@@ -415,6 +429,7 @@ const styles = StyleSheet.create({
     },
     activityInfo: {
         flex: 1,
+        marginRight: 8, // Add spacing before badge
     },
     activityName: {
         fontSize: 16,
@@ -423,23 +438,25 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     activityDetails: {
-        flexDirection: 'row',
-        gap: 12,
+        flexDirection: 'column', // Changed to column for better responsiveness with long text
+        gap: 4, // Reduced gap since it's vertical now
     },
     activityDetailItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 6,
     },
     activityDetailText: {
         fontSize: 12,
         color: '#666',
+        flex: 1, // Allow text to wrap
     },
     activityCategoryBadge: {
         backgroundColor: 'rgba(255, 99, 71, 0.1)',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 12,
+        alignSelf: 'flex-start', // Align to top
     },
     activityCategoryText: {
         fontSize: 12,
