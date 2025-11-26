@@ -189,12 +189,12 @@ export const stalls = [
   {
     id: 's3',
     name: 'THE KARINJA CAFÉ',
-    image: require('../../assets/stalls/KarinjaCafe.jpg'),
+    image: require('../../assets/stalls/karinja_cafe_3.jpg'),
     about: "Discover a taste of Turkey at The Karinja Café in Centurion. Our cosy restaurant offers a delightful menu for breakfast, lunch, and dinner, with options for dine-in, takeout, and delivery. Enjoy Turkish coffee and small plates in a casual, group-friendly atmosphere. Wheelchair accessible with plenty of parking. Come and experience a warm, welcoming atmosphere and excellent service at The Karinja Café.",
     gallery: [
       require('../../assets/stalls/karinja_cafe_1.jpg'),
       require('../../assets/stalls/karinja_cafe_2.jpg'),
-      require('../../assets/stalls/karinja_cafe_3.jpg'),
+      require('../../assets/stalls/KarinjaCafe.jpg'),
     ],
     bookable: false,
   },
@@ -218,10 +218,10 @@ export const stalls = [
     about: "Experience the warmth of Turkish culture at Çayhane in Centurion.\nStep into our inviting Turkish tea house, where the samovar is always simmering and the aroma of freshly brewed çay fills the air.\nEnjoy endless glasses of traditional Turkish tea served the proper way—deep ruby-red, perfectly steeped, and paired with classic accompaniments: golden borek, simit and sweet bites of baklava and lokum.\nOpen from early breakfast through late dinner, Çayhane is the perfect spot to linger with friends, catch up over a quiet cup, or gather the whole family. Dine in, take away, or order delivery—our çay and hospitality travel well.\nCome, sit, sip, and let the day slow down. Çayhane – where every glass feels like home",
     gallery: [
       require('../../assets/stalls/cayhane_1.jpg'),
-      require('../../assets/stalls/cayhane_2.jpg'),
+      require('../../assets/stalls/cayhane_5.jpg'),
       require('../../assets/stalls/cayhane_3.jpg'),
       require('../../assets/stalls/cayhane_4.jpg'),
-      require('../../assets/stalls/cayhane_5.jpg'),
+      require('../../assets/stalls/cayhane_2.jpg'),
     ],
     bookable: false,
   },

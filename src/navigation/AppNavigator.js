@@ -4,8 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import HomeScreen from '../screens/HomeScreen';
 import FestivalScreen from '../screens/FestivalScreen';
 import ReservationScreen from '../screens/ReservationScreen';
-import InfoScreen from '../screens/InfoScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import InfoScreen from '../screens/InfoScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 import { createStackNavigator } from '@react-navigation/stack';
@@ -30,8 +30,6 @@ function MainTabs({ festivals, activities, faqs }) {
                         iconName = focused ? 'balloon' : 'balloon-outline';
                     } else if (route.name === 'Reservation') {
                         iconName = focused ? 'calendar' : 'calendar-outline';
-                    } else if (route.name === 'Info') {
-                        iconName = focused ? 'information-circle' : 'information-circle-outline';
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
@@ -51,10 +49,9 @@ function MainTabs({ festivals, activities, faqs }) {
             <Tab.Screen name="Reservation">
                 {props => <ReservationScreen {...props} />}
             </Tab.Screen>
-            <Tab.Screen name="Info">
-                {props => <InfoScreen {...props} faqs={faqs} />}
+            <Tab.Screen name="Profile">
+                {props => <ProfileScreen {...props} faqs={faqs} />}
             </Tab.Screen>
-            <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
     );
 }
@@ -67,6 +64,9 @@ export default function AppNavigator({ festivals, activities, faqs }) {
                     {props => <MainTabs {...props} festivals={festivals} activities={activities} faqs={faqs} />}
                 </Stack.Screen>
                 <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+                <Stack.Screen name="FAQ">
+                    {props => <InfoScreen {...props} faqs={faqs} />}
+                </Stack.Screen>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Signup" component={SignupScreen} />
             </Stack.Navigator>
