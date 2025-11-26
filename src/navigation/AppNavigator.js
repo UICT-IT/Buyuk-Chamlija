@@ -13,6 +13,19 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import EventDetailScreen from '../screens/EventDetailScreen';
 
+// Ticket Screens
+import MyTicketsScreen from '../screens/tickets/MyTicketsScreen';
+import TicketDetailScreen from '../screens/tickets/TicketDetailScreen';
+import QRCodeScreen from '../screens/tickets/QRCodeScreen';
+
+// Seller Screens
+import SellerLoginScreen from '../screens/seller/SellerLoginScreen';
+import SellerDashboardScreen from '../screens/seller/SellerDashboardScreen';
+import ScanTicketScreen from '../screens/seller/ScanTicketScreen';
+import TicketScanResultScreen from '../screens/seller/TicketScanResultScreen';
+import PaymentConfirmationScreen from '../screens/seller/PaymentConfirmationScreen';
+import SaleHistoryScreen from '../screens/seller/SaleHistoryScreen';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -30,6 +43,10 @@ function MainTabs({ festivals, activities, faqs }) {
                         iconName = focused ? 'balloon' : 'balloon-outline';
                     } else if (route.name === 'Reservation') {
                         iconName = focused ? 'calendar' : 'calendar-outline';
+                    } else if (route.name === 'Tickets') {
+                        iconName = focused ? 'ticket' : 'ticket-outline';
+                    } else if (route.name === 'Seller') {
+                        iconName = focused ? 'storefront' : 'storefront-outline';
                     } else if (route.name === 'Profile') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
@@ -49,6 +66,8 @@ function MainTabs({ festivals, activities, faqs }) {
             <Tab.Screen name="Reservation">
                 {props => <ReservationScreen {...props} />}
             </Tab.Screen>
+            <Tab.Screen name="Tickets" component={MyTicketsScreen} />
+            <Tab.Screen name="Seller" component={SellerLoginScreen} />
             <Tab.Screen name="Profile">
                 {props => <ProfileScreen {...props} faqs={faqs} />}
             </Tab.Screen>
@@ -69,6 +88,18 @@ export default function AppNavigator({ festivals, activities, faqs }) {
                 </Stack.Screen>
                 <Stack.Screen name="Login" component={LoginScreen} />
                 <Stack.Screen name="Signup" component={SignupScreen} />
+
+                {/* Ticket Screens */}
+                <Stack.Screen name="TicketDetail" component={TicketDetailScreen} />
+                <Stack.Screen name="QRCode" component={QRCodeScreen} />
+
+                {/* Seller Screens */}
+                <Stack.Screen name="SellerLogin" component={SellerLoginScreen} />
+                <Stack.Screen name="SellerDashboard" component={SellerDashboardScreen} />
+                <Stack.Screen name="ScanTicket" component={ScanTicketScreen} />
+                <Stack.Screen name="TicketScanResult" component={TicketScanResultScreen} />
+                <Stack.Screen name="PaymentConfirmation" component={PaymentConfirmationScreen} />
+                <Stack.Screen name="SaleHistory" component={SaleHistoryScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     );

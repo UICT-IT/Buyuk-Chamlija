@@ -172,10 +172,11 @@ export const stalls = [
     image: require('../../assets/stalls/afro_lato_1.jpg'),
     about: "Welcome to Afro Lato – your happy farm ice-cream escape!\nEndless Pretoria skies, the smell of fresh cream in the air, and a bright little stall overflowing with handmade ice cream that tastes like pure sunshine.\nWe churn every small batch right here using fresh farm dairy and the season’s ripest fruit, nuts and home-grown flavors. One scoop and the kids are beaming, the grown-ups are smiling wide, and the whole day feels like a holiday.\nGrab a cone (or three), find your spot, and let the good times melt in your mouth. This isn’t just ice cream; it’s slow licks, sticky fingers, big laughs and the sweetest farm memories.\nAfro Lato: real farm, real cream, ridiculously happy ice cream. We’ll save you a scoop!",
     gallery: [
-      require('../../assets/stalls/afro_lato_1.jpg'),
+      require('../../assets/stalls/afro_lato_5.jpg'),
       require('../../assets/stalls/afro_lato_2.png'),
       require('../../assets/stalls/afro_lato_3.jpg'),
       require('../../assets/stalls/afro_lato_4.jpg'),
+      require('../../assets/stalls/afro_lato_1.jpg'),
     ],
     bookable: false,
   },
