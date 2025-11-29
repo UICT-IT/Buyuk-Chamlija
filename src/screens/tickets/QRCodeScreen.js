@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import QRCode from 'react-native-qrcode-svg';
 
 export default function QRCodeScreen({ route, navigation }) {
     const { ticket } = route.params;
@@ -21,7 +22,12 @@ export default function QRCodeScreen({ route, navigation }) {
                 <Text style={styles.subtitle}>to the seller at the entrance</Text>
 
                 <View style={styles.qrContainer}>
-                    <Ionicons name="qr-code" size={250} color="#333" />
+                    <QRCode
+                        value={ticket.qrCode}
+                        size={250}
+                        color="black"
+                        backgroundColor="white"
+                    />
                 </View>
 
                 <View style={styles.infoContainer}>

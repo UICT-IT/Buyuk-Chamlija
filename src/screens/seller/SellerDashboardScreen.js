@@ -2,18 +2,30 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { mockSaleHistory, TICKET_PRICING } from '../../data/mockTicketData';
+import { TICKET_PRICING } from '../../data/mockTicketData';
+import { useAuth } from '../../context/AuthContext';
+import { useTickets } from '../../context/TicketContext';
 
-export default function SellerDashboardScreen({ route, navigation }) {
-    const { seller } = route.params;
+export default function SellerDashboardScreen({ navigation }) {
+    const { user, logout } = useAuth();
+    const { tickets } = useTickets();
 
     // Calculate today's stats
     const today = new Date().toLocaleDateString();
-    const todaySales = mockSaleHistory.filter(sale =>
-        new Date(sale.saleDate).toLocaleDateString() === today
+    const todaySales = tickets.filter(ticket =>
+        ticket.sellerId === user?.id &&
+        new Date(ticket.purchaseDate).toLocaleDateString() === today
     );
-    const todayRevenue = todaySales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+    const todayRevenue = todaySales.reduce((sum, ticket) => sum + (ticket.totalAmount || 0), 0);
     const todayTickets = todaySales.length;
+
+    const handleLogout = () => {
+        logout();
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Main' }],
+        });
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -22,11 +34,11 @@ export default function SellerDashboardScreen({ route, navigation }) {
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.greeting}>Welcome back,</Text>
-                        <Text style={styles.sellerName}>{seller.name}</Text>
+                        <Text style={styles.sellerName}>{user?.name || 'Seller'}</Text>
                     </View>
                     <TouchableOpacity
                         style={styles.logoutButton}
-                        onPress={() => navigation.navigate('SellerLogin')}
+                        onPress={handleLogout}
                     >
                         <Ionicons name="log-out-outline" size={24} color="tomato" />
                     </TouchableOpacity>
@@ -35,7 +47,7 @@ export default function SellerDashboardScreen({ route, navigation }) {
                 {/* Main Action Button */}
                 <TouchableOpacity
                     style={styles.scanButton}
-                    onPress={() => navigation.navigate('ScanTicket', { seller })}
+                    onPress={() => navigation.navigate('ScanTicket', { seller: user })}
                     activeOpacity={0.8}
                 >
                     <Ionicons name="qr-code-outline" size={60} color="white" />
@@ -76,7 +88,7 @@ export default function SellerDashboardScreen({ route, navigation }) {
                 {/* Sale History Button */}
                 <TouchableOpacity
                     style={styles.historyButton}
-                    onPress={() => navigation.navigate('SaleHistory', { seller })}
+                    onPress={() => navigation.navigate('SaleHistory', { seller: user })}
                 >
                     <Ionicons name="list-outline" size={24} color="tomato" />
                     <Text style={styles.historyButtonText}>View Sale History</Text>

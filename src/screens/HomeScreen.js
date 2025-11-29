@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, useWindowDimensions, ScrollView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { stalls, activities } from '../data/mockData';
 import EventDetailModal from '../components/EventDetailModal';
 import StallDetailModal from '../components/StallDetailModal';
@@ -8,9 +9,10 @@ import AllStallsModal from '../components/AllStallsModal';
 import AllActivitiesModal from '../components/AllActivitiesModal';
 import ActivityDetailModal from '../components/ActivityDetailModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../theme';
 
-const GAP = 20; // Increased gap
-const PADDING = 20; // Increased padding for better margins
+const GAP = theme.spacing.m;
+const PADDING = theme.spacing.l;
 
 export default function HomeScreen(props) {
     const { festivals } = props;
@@ -24,15 +26,14 @@ export default function HomeScreen(props) {
     // Responsive styles
     const responsiveStyles = {
         sectionHeader: {
-            fontSize: width > 600 ? 22 : 20,
+            fontSize: width > 600 ? 24 : 22,
         },
         welcomeMessage: {
-            fontSize: width > 600 ? 32 : 28,
+            fontSize: width > 600 ? 36 : 32,
         },
     };
 
     // Responsive calculations
-    // Keep 2 columns for mobile to make them wide, 3 for tablet, 4 for desktop
     const numColumns = width > 1000 ? 4 : width > 700 ? 3 : 2;
     const stallCardWidth = (width - (PADDING * 2) - (GAP * (numColumns - 1))) / numColumns;
 
@@ -42,15 +43,18 @@ export default function HomeScreen(props) {
         <TouchableOpacity
             style={styles.festivalCard}
             onPress={() => setSelectedFestival(item)}
-            activeOpacity={0.9}
+            activeOpacity={0.95}
         >
             <Image source={item.image} style={styles.festivalCardImage} resizeMode="cover" />
-            <View style={styles.festivalCardOverlay}>
+            <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.8)']}
+                style={styles.festivalCardOverlay}
+            >
                 <View style={styles.festivalCardHeader}>
                     {item.isActive && (
                         <View style={styles.liveBadge}>
                             <View style={styles.liveDot} />
-                            <Text style={styles.liveText}>LIVE</Text>
+                            <Text style={styles.liveText}>LIVE NOW</Text>
                         </View>
                     )}
                 </View>
@@ -58,129 +62,137 @@ export default function HomeScreen(props) {
                     <Text style={styles.festivalCardTitle}>{item.name}</Text>
                     <Text style={styles.festivalCardDate}>{item.dateTime}</Text>
                     <View style={styles.festivalLocationRow}>
-                        <Ionicons name="location-outline" size={16} color="white" />
+                        <Ionicons name="location" size={16} color={theme.colors.primary} />
                         <Text style={styles.festivalCardLocation}>{item.location}</Text>
                     </View>
                 </View>
-            </View>
+            </LinearGradient>
         </TouchableOpacity>
     );
 
     const renderStallItem = ({ item, cardWidth }) => (
         <TouchableOpacity
-            style={[styles.stallCard, { height: cardWidth * 0.8 }]}
+            style={[styles.stallCard, { height: cardWidth * 0.85 }]}
             onPress={() => setSelectedStall(item)}
+            activeOpacity={0.9}
         >
             <Image source={item.image} style={styles.stallImage} />
-            <View style={styles.stallOverlay}>
-                <Text style={styles.stallName}>{item.name}</Text>
-            </View>
+            <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.7)']}
+                style={styles.stallOverlay}
+            >
+                <Text style={styles.stallName} numberOfLines={1}>{item.name}</Text>
+            </LinearGradient>
         </TouchableOpacity>
     );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {/* Header Section */}
-                <View style={styles.headerContainer}>
-                    <View style={styles.headerTopRow}>
-                        <Image source={require('../../assets/logo.png')} style={styles.logo} />
-                        <TouchableOpacity
-                            onPress={() => props.navigation && props.navigation.navigate('Profile')}
-                        >
-                            <Ionicons name="person-outline" size={22} color="#333" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+        <View style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-                {/* Upcoming Festivals Section */}
-                <View style={styles.sectionContainer}>
-                    {/* Welcome Message */}
-                    <Text style={[styles.welcomeMessage, responsiveStyles.welcomeMessage]}>Welcome to{"\n"}Buyuk Chamlija</Text>
+            {/* Background Gradient */}
+            <LinearGradient
+                colors={['#FFFFFF', '#F0F2F5']}
+                style={StyleSheet.absoluteFill}
+            />
 
-                    <View style={styles.sectionHeaderRow}>
-                        <View style={styles.sectionTitleRow}>
-                            <Ionicons name="calendar-outline" size={24} color="#333" style={styles.sectionIcon} />
-                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Festivals</Text>
+            <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    {/* Header Section */}
+                    <View style={styles.headerContainer}>
+                        <View style={styles.headerTopRow}>
+                            <Image source={require('../../assets/logo.png')} style={styles.logo} />
+                            <TouchableOpacity
+                                style={styles.profileButton}
+                                onPress={() => props.navigation && props.navigation.navigate('Profile')}
+                            >
+                                <Ionicons name="person" size={20} color={theme.colors.primary} />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => props.navigation?.navigate('Festivals')}>
-                            <Text style={styles.viewAllText}>View All</Text>
-                            <Ionicons name="arrow-forward" size={18} color="tomato" />
-                        </TouchableOpacity>
-                    </View>
 
-                    {currentFestival && (
-                        <View key={currentFestival.id} style={styles.festivalWrapper}>
-                            {renderFestivalItem({ item: currentFestival })}
-                        </View>
-                    )}
-                </View>
-
-                {/* Stalls Section */}
-                <View style={styles.sectionContainer}>
-                    <View style={styles.sectionHeaderRow}>
-                        <View style={styles.sectionTitleRow}>
-                            <Ionicons name="storefront-outline" size={24} color="#333" style={styles.sectionIcon} />
-                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Stalls</Text>
-                        </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllStalls(true)}>
-                            <Text style={styles.viewAllText}>View All</Text>
-                            <Ionicons name="arrow-forward" size={18} color="tomato" />
-                        </TouchableOpacity>
+                        <Text style={[styles.welcomeMessage, responsiveStyles.welcomeMessage]}>
+                            Discover{"\n"}
+                            <Text style={{ color: theme.colors.primary }}>Buyuk Chamlija</Text>
+                        </Text>
                     </View>
 
-                    <View style={styles.stallsGrid}>
-                        {stalls.slice(0, 2).map((stall) => (
-                            <View key={stall.id} style={[styles.stallWrapper, { width: stallCardWidth }]}>
-                                {renderStallItem({ item: stall, cardWidth: stallCardWidth })}
+                    {/* Upcoming Festivals Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeaderRow}>
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Featured Event</Text>
+                            <TouchableOpacity style={styles.viewAllBtn} onPress={() => props.navigation?.navigate('Festivals')}>
+                                <Text style={styles.viewAllText}>See All</Text>
+                                <Ionicons name="arrow-forward" size={16} color={theme.colors.primary} />
+                            </TouchableOpacity>
+                        </View>
+
+                        {currentFestival && (
+                            <View key={currentFestival.id} style={styles.festivalWrapper}>
+                                {renderFestivalItem({ item: currentFestival })}
                             </View>
-                        ))}
+                        )}
                     </View>
-                </View>
 
-                {/* Activities Section */}
-                <View style={styles.sectionContainer}>
-                    <View style={styles.sectionHeaderRow}>
-                        <View style={styles.sectionTitleRow}>
-                            <Ionicons name="fitness-outline" size={24} color="#333" style={styles.sectionIcon} />
+                    {/* Stalls Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeaderRow}>
+                            <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Market Stalls</Text>
+                            <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllStalls(true)}>
+                                <Text style={styles.viewAllText}>View All</Text>
+                                <Ionicons name="arrow-forward" size={16} color={theme.colors.primary} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.stallsGrid}>
+                            {stalls.slice(0, 2).map((stall) => (
+                                <View key={stall.id} style={[styles.stallWrapper, { width: stallCardWidth }]}>
+                                    {renderStallItem({ item: stall, cardWidth: stallCardWidth })}
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+
+                    {/* Activities Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeaderRow}>
                             <Text style={[styles.sectionHeader, responsiveStyles.sectionHeader]}>Activities</Text>
+                            <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllActivities(true)}>
+                                <Text style={styles.viewAllText}>View All</Text>
+                                <Ionicons name="arrow-forward" size={16} color={theme.colors.primary} />
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.viewAllBtn} onPress={() => setShowAllActivities(true)}>
-                            <Text style={styles.viewAllText}>View All</Text>
-                            <Ionicons name="arrow-forward" size={18} color="tomato" />
-                        </TouchableOpacity>
-                    </View>
 
-                    {activities.slice(0, 2).map((activity) => (
-                        <TouchableOpacity
-                            key={activity.id}
-                            style={styles.activityCard}
-                            onPress={() => setSelectedActivity(activity)}
-                            activeOpacity={0.7}
-                        >
-                            <View style={styles.activityIconContainer}>
-                                <Ionicons name="calendar" size={20} color="tomato" />
-                            </View>
-                            <View style={styles.activityInfo}>
-                                <Text style={styles.activityName}>{activity.name}</Text>
-                                <View style={styles.activityDetails}>
-                                    <View style={styles.activityDetailItem}>
-                                        <Ionicons name="time-outline" size={14} color="#666" />
-                                        <Text style={styles.activityDetailText}>{activity.startTime}</Text>
-                                    </View>
-                                    <View style={styles.activityDetailItem}>
-                                        <Ionicons name="location-outline" size={14} color="#666" />
-                                        <Text style={styles.activityDetailText}>{activity.location}</Text>
+                        {activities.slice(0, 2).map((activity) => (
+                            <TouchableOpacity
+                                key={activity.id}
+                                style={styles.activityCard}
+                                onPress={() => setSelectedActivity(activity)}
+                                activeOpacity={0.7}
+                            >
+                                <View style={styles.activityIconContainer}>
+                                    <Ionicons name="calendar" size={20} color={theme.colors.primary} />
+                                </View>
+                                <View style={styles.activityInfo}>
+                                    <Text style={styles.activityName}>{activity.name}</Text>
+                                    <View style={styles.activityDetails}>
+                                        <View style={styles.activityDetailItem}>
+                                            <Ionicons name="time-outline" size={14} color={theme.colors.textSecondary} />
+                                            <Text style={styles.activityDetailText}>{activity.startTime}</Text>
+                                        </View>
+                                        <View style={styles.activityDetailItem}>
+                                            <Ionicons name="location-outline" size={14} color={theme.colors.textSecondary} />
+                                            <Text style={styles.activityDetailText}>{activity.location}</Text>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
-                            <View style={styles.activityCategoryBadge}>
-                                <Text style={styles.activityCategoryText}>{activity.category}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </ScrollView>
+                                <View style={styles.activityCategoryBadge}>
+                                    <Text style={styles.activityCategoryText}>{activity.category}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
 
             <EventDetailModal
                 visible={!!selectedFestival}
@@ -192,9 +204,6 @@ export default function HomeScreen(props) {
                 stall={selectedStall}
                 onClose={() => setSelectedStall(null)}
                 onBook={(stall) => {
-                    // Navigate to Reservation tab and pass stallId
-                    // We need to access navigation prop here
-                    // HomeScreen receives 'navigation' prop from Tab.Screen
                     if (props.navigation) {
                         props.navigation.navigate('Reservation', { stallId: stall.id });
                     }
@@ -217,37 +226,51 @@ export default function HomeScreen(props) {
                 visible={showAllActivities}
                 onClose={() => setShowAllActivities(false)}
             />
-        </SafeAreaView >
+        </View >
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5', // Light background
+        backgroundColor: theme.colors.background,
     },
     scrollContent: {
         paddingBottom: 40,
     },
     headerContainer: {
-        padding: PADDING,
-        paddingTop: 10, // Reduced from 60
-        marginBottom: 30, // Increased from 20
+        paddingHorizontal: PADDING,
+        paddingTop: 10,
+        marginBottom: 20,
     },
     headerTopRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     logo: {
-        width: 60,
-        height: 60,
+        width: 50,
+        height: 50,
         resizeMode: 'contain',
+    },
+    profileButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...theme.shadows.small,
+    },
+    welcomeMessage: {
+        ...theme.typography.h1,
+        color: theme.colors.textPrimary,
+        lineHeight: 40,
     },
     sectionContainer: {
         paddingHorizontal: PADDING,
-        marginBottom: 25,
+        marginBottom: 30,
     },
     sectionHeaderRow: {
         flexDirection: 'row',
@@ -255,33 +278,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 15,
     },
-    sectionTitleRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    sectionIcon: {
-        marginRight: 10,
-    },
     sectionHeader: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
+        ...theme.typography.h2,
+        color: theme.colors.textPrimary,
     },
     viewAllBtn: {
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: 'rgba(255, 107, 107, 0.1)', // Primary with opacity
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
     },
     viewAllText: {
-        color: 'tomato',
-        fontSize: 14, // Reduced from 16
-        marginRight: 5,
-    },
-    welcomeMessage: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-        textAlign: 'left',
+        color: theme.colors.primary,
+        fontSize: 12,
+        fontWeight: '600',
+        marginRight: 4,
     },
 
     // Stalls Grid
@@ -295,15 +308,10 @@ const styles = StyleSheet.create({
     },
     stallCard: {
         width: '100%',
-        // Height is set dynamically
-        borderRadius: 20, // Increased radius
+        borderRadius: theme.borderRadius.l,
         overflow: 'hidden',
-        position: 'relative',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        backgroundColor: 'white',
+        ...theme.shadows.medium,
     },
     stallImage: {
         width: '100%',
@@ -315,31 +323,28 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        padding: 15, // Increased padding
-        alignItems: 'center',
+        padding: 12,
+        paddingTop: 30, // For gradient fade
     },
     stallName: {
         color: 'white',
-        fontSize: 16, // Reduced from 18
+        fontSize: 16,
         fontWeight: 'bold',
-        textAlign: 'center',
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 4,
     },
 
-    // Festival Card (matching FestivalScreen style)
+    // Festival Card
     festivalWrapper: {
-        marginBottom: 15,
+        marginBottom: 5,
     },
     festivalCard: {
-        height: 220,
-        borderRadius: 16,
+        height: 240,
+        borderRadius: theme.borderRadius.xl,
         overflow: 'hidden',
         backgroundColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
+        ...theme.shadows.large,
     },
     festivalCardImage: {
         width: '100%',
@@ -347,21 +352,21 @@ const styles = StyleSheet.create({
     },
     festivalCardOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.3)',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: 20,
     },
     festivalCardHeader: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
     },
     liveBadge: {
-        backgroundColor: 'tomato',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 12,
+        backgroundColor: theme.colors.primary,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
+        ...theme.shadows.small,
     },
     liveDot: {
         width: 6,
@@ -372,74 +377,78 @@ const styles = StyleSheet.create({
     },
     liveText: {
         color: 'white',
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 'bold',
+        letterSpacing: 1,
     },
     festivalCardContent: {
     },
     festivalCardTitle: {
-        fontSize: 22,
+        fontSize: 28,
         fontWeight: 'bold',
         color: 'white',
         marginBottom: 4,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10,
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 8,
     },
     festivalCardDate: {
         fontSize: 14,
         color: 'rgba(255,255,255,0.9)',
-        marginBottom: 8,
+        marginBottom: 12,
         fontWeight: '500',
     },
     festivalLocationRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 4, // Added margin
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 12,
+        backdropFilter: 'blur(10px)', // Works on iOS
     },
     festivalCardLocation: {
-        fontSize: 14,
-        color: 'rgba(255,255,255,0.9)',
-        marginLeft: 4,
-        flex: 1, // Allow text to wrap/shrink
+        fontSize: 12,
+        color: 'white',
+        marginLeft: 6,
+        fontWeight: '600',
     },
 
     // Activities
     activityCard: {
         backgroundColor: 'white',
-        borderRadius: 16,
+        borderRadius: theme.borderRadius.l,
         padding: 16,
         marginBottom: 12,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        ...theme.shadows.small,
+        borderWidth: 1,
+        borderColor: theme.colors.surfaceHighlight,
     },
     activityIconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255, 99, 71, 0.1)',
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(255, 107, 107, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
+        marginRight: 16,
     },
     activityInfo: {
         flex: 1,
-        marginRight: 8, // Add spacing before badge
+        marginRight: 8,
     },
     activityName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: theme.colors.textPrimary,
         marginBottom: 6,
     },
     activityDetails: {
-        flexDirection: 'column', // Changed to column for better responsiveness with long text
-        gap: 4, // Reduced gap since it's vertical now
+        flexDirection: 'column',
+        gap: 4,
     },
     activityDetailItem: {
         flexDirection: 'row',
@@ -448,19 +457,19 @@ const styles = StyleSheet.create({
     },
     activityDetailText: {
         fontSize: 12,
-        color: '#666',
-        flex: 1, // Allow text to wrap
+        color: theme.colors.textSecondary,
     },
     activityCategoryBadge: {
-        backgroundColor: 'rgba(255, 99, 71, 0.1)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-        alignSelf: 'flex-start', // Align to top
+        backgroundColor: 'rgba(78, 205, 196, 0.1)', // Teal with opacity
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+        alignSelf: 'flex-start',
     },
     activityCategoryText: {
-        fontSize: 12,
-        color: 'tomato',
-        fontWeight: '600',
+        fontSize: 10,
+        color: theme.colors.secondary,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
     },
 });

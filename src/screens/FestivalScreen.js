@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { normalizeFestival } from '../utils/normalizeFestival';
 import EventDetailModal from '../components/EventDetailModal';
+import { theme } from '../theme';
 
 export default function FestivalScreen({ festivals, navigation }) {
     const [selectedFestival, setSelectedFestival] = useState(null);
@@ -17,135 +19,147 @@ export default function FestivalScreen({ festivals, navigation }) {
 
     const renderFestivalCard = ({ item, isLive }) => (
         <TouchableOpacity
-            style={styles.card}
+            style={styles.cardContainer}
             onPress={() => setSelectedFestival(item)}
-            activeOpacity={0.9}
+            activeOpacity={0.95}
         >
-            <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
-            <View style={styles.cardOverlay}>
-                <View style={styles.cardHeader}>
-                    {isLive && (
-                        <View style={styles.liveBadge}>
-                            <View style={styles.liveDot} />
-                            <Text style={styles.liveText}>LIVE</Text>
-                        </View>
-                    )}
-                </View>
-                <View style={styles.cardContent}>
-                    <Text style={styles.cardTitle}>{item.name}</Text>
-                    <Text style={styles.cardDate}>{item.dateTime}</Text>
-                    <View style={styles.locationRow}>
-                        <Ionicons name="location-outline" size={16} color="white" />
-                        <Text style={styles.cardLocation}>{item.location}</Text>
+            <View style={styles.card}>
+                <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
+                <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                    style={styles.cardOverlay}
+                >
+                    <View style={styles.cardHeader}>
+                        {isLive && (
+                            <View style={styles.liveBadge}>
+                                <View style={styles.liveDot} />
+                                <Text style={styles.liveText}>LIVE</Text>
+                            </View>
+                        )}
                     </View>
-                </View>
+                    <View style={styles.cardContent}>
+                        <Text style={styles.cardTitle}>{item.name}</Text>
+                        <View style={styles.cardMetaRow}>
+                            <View style={styles.metaItem}>
+                                <Ionicons name="calendar-outline" size={14} color={theme.colors.textLight} />
+                                <Text style={styles.cardDate}>{item.dateTime}</Text>
+                            </View>
+                            <View style={styles.metaItem}>
+                                <Ionicons name="location-outline" size={14} color={theme.colors.textLight} />
+                                <Text style={styles.cardLocation}>{item.location}</Text>
+                            </View>
+                        </View>
+                    </View>
+                </LinearGradient>
             </View>
         </TouchableOpacity>
     );
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Festivals</Text>
-            </View>
+        <View style={styles.container}>
+            <StatusBar barStyle="dark-content" />
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Festivals</Text>
+                </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {currentFestivals.length > 0 && (
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Happening Now</Text>
-                            <View style={styles.pulsingDot} />
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    {currentFestivals.length > 0 && (
+                        <View style={styles.section}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={styles.sectionTitle}>Happening Now</Text>
+                                <View style={styles.pulsingDot} />
+                            </View>
+                            <FlatList
+                                data={currentFestivals}
+                                renderItem={({ item }) => renderFestivalCard({ item, isLive: true })}
+                                keyExtractor={item => item.id}
+                                scrollEnabled={false}
+                            />
                         </View>
-                        <FlatList
-                            data={currentFestivals}
-                            renderItem={({ item }) => renderFestivalCard({ item, isLive: true })}
-                            keyExtractor={item => item.id}
-                            scrollEnabled={false}
-                        />
-                    </View>
-                )}
+                    )}
 
-                {upcomingFestivals.length > 0 && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Upcoming Festivals</Text>
-                        <FlatList
-                            data={upcomingFestivals}
-                            renderItem={({ item }) => renderFestivalCard({ item, isLive: false })}
-                            keyExtractor={item => item.id}
-                            scrollEnabled={false}
-                        />
-                    </View>
-                )}
+                    {upcomingFestivals.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Upcoming Festivals</Text>
+                            <FlatList
+                                data={upcomingFestivals}
+                                renderItem={({ item }) => renderFestivalCard({ item, isLive: false })}
+                                keyExtractor={item => item.id}
+                                scrollEnabled={false}
+                            />
+                        </View>
+                    )}
 
-                {currentFestivals.length === 0 && upcomingFestivals.length === 0 && (
-                    <View style={styles.emptyState}>
-                        <Ionicons name="calendar-outline" size={64} color="#ccc" />
-                        <Text style={styles.emptyStateText}>No festivals found</Text>
-                    </View>
-                )}
-            </ScrollView>
+                    {currentFestivals.length === 0 && upcomingFestivals.length === 0 && (
+                        <View style={styles.emptyState}>
+                            <Ionicons name="calendar-outline" size={64} color={theme.colors.textLight} />
+                            <Text style={styles.emptyStateText}>No festivals found</Text>
+                        </View>
+                    )}
+                </ScrollView>
 
-            <EventDetailModal
-                visible={!!selectedFestival}
-                event={selectedFestival}
-                onClose={() => setSelectedFestival(null)}
-            />
-        </SafeAreaView>
+                <EventDetailModal
+                    visible={!!selectedFestival}
+                    event={selectedFestival}
+                    onClose={() => setSelectedFestival(null)}
+                />
+            </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: theme.colors.background,
+    },
+    safeArea: {
+        flex: 1,
     },
     header: {
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        backgroundColor: 'white',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        paddingHorizontal: theme.spacing.l,
+        paddingVertical: theme.spacing.m,
+        backgroundColor: theme.colors.background,
     },
     headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
+        ...theme.typography.h1,
+        color: theme.colors.textPrimary,
     },
     scrollContent: {
-        padding: 20,
+        padding: theme.spacing.l,
         paddingBottom: 100,
     },
     section: {
-        marginBottom: 30,
+        marginBottom: theme.spacing.xl,
     },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: theme.spacing.m,
     },
     sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1a1a1a',
+        ...theme.typography.h2,
+        color: theme.colors.textPrimary,
         marginRight: 8,
     },
     pulsingDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: 'tomato',
+        backgroundColor: theme.colors.primary,
+    },
+
+    // Card Styles
+    cardContainer: {
+        marginBottom: theme.spacing.l,
+        ...theme.shadows.medium,
     },
     card: {
-        height: 220,
-        borderRadius: 16,
+        height: 240,
+        borderRadius: theme.borderRadius.xl,
         overflow: 'hidden',
-        marginBottom: 16,
         backgroundColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
     },
     cardImage: {
         width: '100%',
@@ -153,21 +167,21 @@ const styles = StyleSheet.create({
     },
     cardOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.3)',
         justifyContent: 'space-between',
-        padding: 16,
+        padding: theme.spacing.l,
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
     },
     liveBadge: {
-        backgroundColor: 'tomato',
+        backgroundColor: theme.colors.primary,
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12,
         flexDirection: 'row',
         alignItems: 'center',
+        ...theme.shadows.small,
     },
     liveDot: {
         width: 6,
@@ -178,36 +192,49 @@ const styles = StyleSheet.create({
     },
     liveText: {
         color: 'white',
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 'bold',
+        letterSpacing: 1,
     },
     cardContent: {
-
+        width: '100%',
     },
     cardTitle: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
         color: 'white',
-        marginBottom: 4,
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10
-    },
-    cardDate: {
-        fontSize: 14,
-        color: 'rgba(255,255,255,0.9)',
         marginBottom: 8,
-        fontWeight: '500',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
-    locationRow: {
+    cardMetaRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 12,
+    },
+    metaItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        gap: 4,
+    },
+    cardDate: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.9)',
+        fontWeight: '500',
     },
     cardLocation: {
-        fontSize: 14,
+        fontSize: 12,
         color: 'rgba(255,255,255,0.9)',
-        marginLeft: 4,
+        fontWeight: '500',
     },
+
+    // Empty State
     emptyState: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -216,6 +243,6 @@ const styles = StyleSheet.create({
     emptyStateText: {
         marginTop: 16,
         fontSize: 16,
-        color: '#999',
+        color: theme.colors.textSecondary,
     },
 });

@@ -8,10 +8,9 @@ export const TICKET_PRICING = {
 
 // Ticket statuses
 export const TICKET_STATUS = {
-    PENDING: 'Pending Payment',
-    PAID: 'Paid',
     ACTIVE: 'Active',
     EXPIRED: 'Expired',
+    USED: 'Used', // When user has entered the premises
 };
 
 // Mock user tickets
@@ -35,7 +34,7 @@ export const mockTickets = [
         userName: 'John Doe',
         userEmail: 'john@example.com',
         qrCode: 'QR-TKT-002',
-        status: TICKET_STATUS.PAID,
+        status: TICKET_STATUS.ACTIVE, // Changed from PAID
         kids: 1,
         adults: 1,
         totalAmount: 75, // (1 * 25) + (1 * 50)
@@ -48,7 +47,7 @@ export const mockTickets = [
         userName: 'John Doe',
         userEmail: 'john@example.com',
         qrCode: 'QR-TKT-003',
-        status: TICKET_STATUS.PENDING,
+        status: TICKET_STATUS.ACTIVE, // Changed from RESERVED
         kids: 3,
         adults: 0,
         totalAmount: 75, // (3 * 25)
@@ -122,13 +121,32 @@ export const getStatusColor = (status) => {
     switch (status) {
         case TICKET_STATUS.ACTIVE:
             return '#4CAF50'; // Green
-        case TICKET_STATUS.PAID:
+        case TICKET_STATUS.USED:
             return '#2196F3'; // Blue
-        case TICKET_STATUS.PENDING:
-            return '#FF9800'; // Orange
         case TICKET_STATUS.EXPIRED:
             return '#9E9E9E'; // Gray
         default:
             return '#666';
     }
+};
+
+// Helper function to get user by ID (mock implementation)
+export const getUserById = (userId) => {
+    // In a real app, this would fetch from a database
+    // For now, we'll return a mock user if the ID matches our pattern
+    if (userId) {
+        return {
+            id: userId,
+            name: 'John Doe', // Mock name
+            email: 'john@example.com', // Mock email
+            phone: '+27 82 123 4567', // Mock phone
+        };
+    }
+    return null;
+};
+
+// Helper function to add a new ticket (mock implementation)
+export const addTicket = (ticket) => {
+    mockTickets.push(ticket);
+    return ticket;
 };

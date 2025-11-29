@@ -182,13 +182,6 @@ export const stalls = [
     bookable: false,
   },
   {
-    id: 's1',
-    name: 'The Barn',
-    image: require('../../assets/stalls/The Barn.jpg'),
-    about: "Wouldn't you like to turn your wedding celebrations into an unforgettable memory? The Barn is the perfect place for you.",
-    bookable: true,
-  },
-  {
     id: 's3',
     name: 'THE KARINJA CAFÉ',
     image: require('../../assets/stalls/karinja_cafe_3.jpg'),
