@@ -1,102 +1,104 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getStatusColor } from '../../data/mockTicketData';
+
+const { width } = Dimensions.get('window');
+const TICKET_WIDTH = width - 40;
 
 export default function TicketDetailScreen({ route, navigation }) {
     const { ticket } = route.params;
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#333" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Ticket Details</Text>
-                    <View style={{ width: 24 }} />
-                </View>
-
-                {/* QR Code Section */}
-                <TouchableOpacity
-                    style={styles.qrSection}
-                    onPress={() => navigation.navigate('QRCode', { ticket })}
-                    activeOpacity={0.8}
-                >
-                    <View style={styles.qrPlaceholder}>
-                        <Ionicons name="qr-code-outline" size={120} color="#666" />
-                        <Text style={styles.qrText}>Tap to view QR code</Text>
-                    </View>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
+                <Text style={styles.headerTitle}>My Ticket</Text>
+                <View style={{ width: 24 }} />
+            </View>
 
-                {/* Status Badge */}
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(ticket.status) }]}>
-                    <Text style={styles.statusText}>{ticket.status}</Text>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
+                {/* Ticket Container */}
+                <View style={styles.ticketContainer}>
+                    {/* Ticket Header (Gradient) */}
+                    <LinearGradient
+                        colors={['#ff6347', '#ff4500']}
+                        style={styles.ticketHeader}
+                    >
+                        <View style={styles.logoContainer}>
+                            <Ionicons name="ticket-outline" size={32} color="white" />
+                            <Text style={styles.eventName}>Buyuk Chamlija</Text>
+                        </View>
+                        <Text style={styles.ticketTitle}>FESTIVAL PASS</Text>
+
+                        <View style={[styles.statusBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                            <Text style={styles.statusText}>{ticket.status}</Text>
+                        </View>
+                    </LinearGradient>
+
+                    {/* Ticket Body */}
+                    <View style={styles.ticketBody}>
+                        <View style={styles.row}>
+                            <View style={styles.column}>
+                                <Text style={styles.label}>DATE</Text>
+                                <Text style={styles.value}>{new Date(ticket.purchaseDate).toLocaleDateString()}</Text>
+                            </View>
+                            <View style={styles.columnRight}>
+                                <Text style={styles.label}>TIME</Text>
+                                <Text style={styles.value}>
+                                    {new Date(ticket.purchaseDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.row}>
+                            <View style={styles.column}>
+                                <Text style={styles.label}>GUESTS</Text>
+                                <Text style={styles.value}>{ticket.adults} Adults, {ticket.kids} Kids</Text>
+                            </View>
+                        </View>
+
+                        <View style={styles.row}>
+                            <View style={styles.column}>
+                                <Text style={styles.label}>TOTAL PAID</Text>
+                                <Text style={styles.valuePrice}>R{ticket.totalAmount}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Divider with Cutouts */}
+                    <View style={styles.dividerContainer}>
+                        <View style={styles.circleLeft} />
+                        <View style={styles.dashedLine} />
+                        <View style={styles.circleRight} />
+                    </View>
+
+                    {/* Ticket Footer (QR) */}
+                    <View style={styles.ticketFooter}>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('QRCode', { ticket })}
+                            activeOpacity={0.8}
+                            style={styles.qrContainer}
+                        >
+                            <Ionicons name="qr-code" size={100} color="#333" />
+                            <Text style={styles.tapText}>Tap to enlarge</Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.ticketIdLabel}>TICKET ID</Text>
+                        <Text style={styles.ticketId}>{ticket.id}</Text>
+                        <Text style={styles.qrRef}>{ticket.qrCode}</Text>
+                    </View>
                 </View>
 
-                {/* Ticket Info Card */}
-                <View style={styles.infoCard}>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Ticket ID</Text>
-                        <Text style={styles.infoValue}>{ticket.id}</Text>
-                    </View>
+                <Text style={styles.footerNote}>
+                    Please show this ticket at the entrance.
+                </Text>
 
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>QR Reference</Text>
-                        <Text style={styles.infoValue}>{ticket.qrCode}</Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Kids</Text>
-                        <Text style={styles.infoValue}>{ticket.kids}</Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Adults</Text>
-                        <Text style={styles.infoValue}>{ticket.adults}</Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Purchase Date</Text>
-                        <Text style={styles.infoValue}>
-                            {new Date(ticket.purchaseDate).toLocaleDateString()}
-                        </Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Expiry Date</Text>
-                        <Text style={styles.infoValue}>
-                            {new Date(ticket.expiryDate).toLocaleDateString()}
-                        </Text>
-                    </View>
-
-                    <View style={styles.divider} />
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.totalLabel}>Total Amount</Text>
-                        <Text style={styles.totalValue}>R{ticket.totalAmount}</Text>
-                    </View>
-                </View>
-
-                {/* Info Notice */}
-                <View style={styles.notice}>
-                    <Ionicons name="information-circle-outline" size={20} color="#2196F3" />
-                    <Text style={styles.noticeText}>
-                        Show this QR code to the seller at the festival entrance
-                    </Text>
-                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -105,109 +107,186 @@ export default function TicketDetailScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9f9f9',
-    },
-    scrollContent: {
-        padding: 20,
+        backgroundColor: '#1a1a1a', // Dark premium background
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
     },
     backButton: {
         padding: 8,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 20,
     },
     headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
+        fontSize: 18,
+        fontWeight: '600',
+        color: 'white',
+        letterSpacing: 1,
     },
-    qrSection: {
+    scrollContent: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    ticketContainer: {
+        width: TICKET_WIDTH,
         backgroundColor: 'white',
-        borderRadius: 16,
-        padding: 30,
-        alignItems: 'center',
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
+        borderRadius: 24,
+        overflow: 'hidden',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 10,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
     },
-    qrPlaceholder: {
+    ticketHeader: {
+        padding: 24,
         alignItems: 'center',
+        justifyContent: 'center',
     },
-    qrText: {
-        marginTop: 12,
-        fontSize: 14,
-        color: '#666',
+    logoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        gap: 8,
+    },
+    eventName: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+        opacity: 0.9,
+    },
+    ticketTitle: {
+        color: 'white',
+        fontSize: 28,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginBottom: 16,
     },
     statusBadge: {
-        alignSelf: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 20,
-        marginBottom: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.4)',
     },
     statusText: {
         color: 'white',
-        fontSize: 14,
         fontWeight: 'bold',
+        fontSize: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
-    infoCard: {
-        backgroundColor: 'white',
-        borderRadius: 16,
-        padding: 20,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
+    ticketBody: {
+        padding: 24,
+        paddingBottom: 10,
     },
-    infoRow: {
+    row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 12,
+        marginBottom: 24,
     },
-    infoLabel: {
-        fontSize: 16,
-        color: '#666',
-    },
-    infoValue: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#f0f0f0',
-    },
-    totalLabel: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    totalValue: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: 'tomato',
-    },
-    notice: {
-        flexDirection: 'row',
-        backgroundColor: '#E3F2FD',
-        padding: 16,
-        borderRadius: 12,
-        alignItems: 'center',
-    },
-    noticeText: {
+    column: {
         flex: 1,
-        marginLeft: 12,
+        alignItems: 'flex-start',
+    },
+    columnRight: {
+        flex: 1,
+        alignItems: 'flex-end',
+    },
+    label: {
+        fontSize: 12,
+        color: '#999',
+        fontWeight: '600',
+        marginBottom: 4,
+        letterSpacing: 0.5,
+    },
+    value: {
+        fontSize: 18,
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    valuePrice: {
+        fontSize: 24,
+        color: 'tomato',
+        fontWeight: 'bold',
+    },
+    dividerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: 40,
+        backgroundColor: 'white',
+        position: 'relative',
+    },
+    circleLeft: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#1a1a1a', // Matches screen background
+        position: 'absolute',
+        left: -20,
+    },
+    circleRight: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#1a1a1a', // Matches screen background
+        position: 'absolute',
+        right: -20,
+    },
+    dashedLine: {
+        flex: 1,
+        height: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderStyle: 'dashed',
+        marginHorizontal: 30,
+    },
+    ticketFooter: {
+        padding: 24,
+        paddingTop: 10,
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    qrContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    tapText: {
+        fontSize: 12,
+        color: '#999',
+        marginTop: 8,
+    },
+    ticketIdLabel: {
+        fontSize: 10,
+        color: '#ccc',
+        fontWeight: 'bold',
+        letterSpacing: 1,
+        marginBottom: 4,
+    },
+    ticketId: {
+        fontSize: 16,
+        color: '#333',
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    qrRef: {
+        fontSize: 12,
+        color: '#999',
+        textAlign: 'center',
+        fontFamily: 'monospace',
+    },
+    footerNote: {
+        marginTop: 24,
+        color: '#666',
         fontSize: 14,
-        color: '#1976D2',
-        lineHeight: 20,
+        opacity: 0.6,
     },
 });

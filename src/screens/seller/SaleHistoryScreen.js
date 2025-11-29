@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { mockSaleHistory } from '../../data/mockTicketData';
+import { useTickets } from '../../context/TicketContext';
 
 export default function SaleHistoryScreen({ route, navigation }) {
     const { seller } = route.params;
+    const { tickets } = useTickets();
 
-    // Filter sales by this seller
-    const sellerSales = mockSaleHistory.filter(sale => sale.sellerId === seller.id);
+    // Filter sales by this seller (ensure sellerId matches)
+    const sellerSales = tickets.filter(ticket => ticket.sellerId === seller.id).sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate));
 
     const renderSaleItem = ({ item }) => (
         <View style={styles.saleCard}>
@@ -16,7 +17,7 @@ export default function SaleHistoryScreen({ route, navigation }) {
                 <View>
                     <Text style={styles.saleId}>{item.id}</Text>
                     <Text style={styles.saleDate}>
-                        {new Date(item.saleDate).toLocaleString()}
+                        {new Date(item.purchaseDate).toLocaleString()}
                     </Text>
                 </View>
                 <Text style={styles.saleAmount}>R{item.totalAmount}</Text>
@@ -25,11 +26,11 @@ export default function SaleHistoryScreen({ route, navigation }) {
             <View style={styles.saleBody}>
                 <View style={styles.saleInfo}>
                     <Ionicons name="person-outline" size={18} color="#666" />
-                    <Text style={styles.saleInfoText}>{item.customerName}</Text>
+                    <Text style={styles.saleInfoText}>{item.userName || 'Unknown Customer'}</Text>
                 </View>
                 <View style={styles.saleInfo}>
-                    <Ionicons name="ticket-outline" size={18} color="#666" />
-                    <Text style={styles.saleInfoText}>{item.ticketId}</Text>
+                    <Ionicons name="mail-outline" size={18} color="#666" />
+                    <Text style={styles.saleInfoText}>{item.userEmail || 'No Email'}</Text>
                 </View>
                 <View style={styles.saleInfo}>
                     <Ionicons name="people-outline" size={18} color="#666" />

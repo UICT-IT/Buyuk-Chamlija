@@ -9,9 +9,10 @@ export default function SignupScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isSeller, setIsSeller] = useState(false);
     const { register } = useAuth();
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         if (!name || !email || !password || !confirmPassword) {
             Alert.alert('Error', 'Please fill in all fields.');
             return;
@@ -21,11 +22,18 @@ export default function SignupScreen({ navigation }) {
             return;
         }
 
-        const result = register(name, email, password);
+        const result = await register(name, email, password, isSeller);
         if (result.success) {
-            Alert.alert('Success', result.message, [
-                { text: 'OK', onPress: () => navigation.navigate('Login') }
-            ]);
+            Alert.alert(
+                'Success!',
+                'Your account has been created. Show your User QR Code at the gate to purchase entrance tickets.',
+                [
+                    {
+                        text: 'View My QR Code',
+                        onPress: () => navigation.navigate('UserQRCode')
+                    }
+                ]
+            );
         } else {
             Alert.alert('Error', result.message);
         }
@@ -99,6 +107,17 @@ export default function SignupScreen({ navigation }) {
                             />
                         </View>
                     </View>
+
+                    <TouchableOpacity
+                        style={styles.checkboxContainer}
+                        onPress={() => setIsSeller(!isSeller)}
+                        activeOpacity={0.7}
+                    >
+                        <View style={[styles.checkbox, isSeller && styles.checkboxChecked]}>
+                            {isSeller && <Ionicons name="checkmark" size={18} color="white" />}
+                        </View>
+                        <Text style={styles.checkboxLabel}>Register as Ticket Seller</Text>
+                    </TouchableOpacity>
 
                     <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
                         <Text style={styles.signupButtonText}>Sign Up</Text>
@@ -204,5 +223,28 @@ const styles = StyleSheet.create({
         color: 'tomato',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: '#ddd',
+        marginRight: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    checkboxChecked: {
+        backgroundColor: 'tomato',
+        borderColor: 'tomato',
+    },
+    checkboxLabel: {
+        fontSize: 15,
+        color: '#333',
     },
 });

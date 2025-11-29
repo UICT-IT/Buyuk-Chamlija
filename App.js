@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native'; // Added Text for visibility
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler'; // REMOVED
 import AppNavigator from './src/navigation/AppNavigator';
 import { festivals as mockFestivals, activities as mockActivities, faqs as mockFaqs } from './src/data/mockData';
-
 import { AuthProvider } from './src/context/AuthContext';
+import { TicketProvider } from './src/context/TicketContext';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +14,6 @@ export default function App() {
   const [faqs, setFaqs] = useState([]);
 
   useEffect(() => {
-    // ... (Your original useEffect logic remains here)
     const loadData = async () => {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -38,13 +37,15 @@ export default function App() {
   }
 
   return (
-    // REMOVED GestureHandlerRootView
-    <SafeAreaProvider>
-      <AuthProvider>
-        <AppNavigator festivals={festivals} activities={activities} faqs={faqs} />
-      </AuthProvider>
-    </SafeAreaProvider>
-    // END of REMOVED GestureHandlerRootView
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <TicketProvider>
+            <AppNavigator festivals={festivals} activities={activities} faqs={faqs} />
+          </TicketProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 

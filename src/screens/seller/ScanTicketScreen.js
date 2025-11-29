@@ -1,53 +1,107 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function ScanTicketScreen({ route, navigation }) {
     const { seller } = route.params;
+    const [permission, requestPermission] = useCameraPermissions();
+    const [scanned, setScanned] = useState(false);
+    const [facing, setFacing] = useState('back');
 
-    const handleSimulateScan = () => {
-        // Simulate scanning a QR code - navigate to result screen with mock ticket
-        const mockQRCode = 'QR-TKT-001'; // Simulating scan of first ticket
-        navigation.navigate('TicketScanResult', { seller, qrCode: mockQRCode });
+    if (!permission) {
+        // Camera permissions are still loading
+        return <View />;
+    }
+
+    if (!permission.granted) {
+        // Camera permissions are not granted yet
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.permissionContainer}>
+                    <Ionicons name="camera-outline" size={64} color="#666" />
+                    <Text style={styles.message}>We need your permission to show the camera</Text>
+                    <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+                        <Text style={styles.permissionButtonText}>Grant Permission</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    const handleBarCodeScanned = ({ type, data }) => {
+        if (scanned) return;
+        setScanned(true);
+        // Navigate to result screen
+        // Pass the actual seller info
+        navigation.navigate('TicketScanResult', {
+            seller: seller,
+            qrCode: data
+        });
+
+        // Reset scanned state after a delay when returning
+        setTimeout(() => setScanned(false), 2000);
+    };
+
+    // Fallback simulation for simulators or if camera fails
+    const simulateScan = (type) => {
+        const mockData = type === 'user'
+            ? 'USER:user-123'
+            : 'TKT:ticket-abc-123';
+
+        handleBarCodeScanned({ type: 'qr', data: mockData });
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Scan Ticket</Text>
-                <View style={{ width: 24 }} />
+                <TouchableOpacity onPress={() => setFacing(current => (current === 'back' ? 'front' : 'back'))}>
+                    <Ionicons name="camera-reverse-outline" size={24} color="white" />
+                </TouchableOpacity>
             </View>
 
-            {/* Camera Placeholder */}
-            <View style={styles.cameraPlaceholder}>
-                <View style={styles.scanFrame}>
-                    <View style={[styles.corner, styles.topLeft]} />
-                    <View style={[styles.corner, styles.topRight]} />
-                    <View style={[styles.corner, styles.bottomLeft]} />
-                    <View style={[styles.corner, styles.bottomRight]} />
-
-                    <Ionicons name="qr-code-outline" size={120} color="rgba(255,255,255,0.5)" />
+            <View style={styles.cameraContainer}>
+                <CameraView
+                    style={styles.camera}
+                    facing={facing}
+                    onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    barcodeScannerSettings={{
+                        barcodeTypes: ["qr"],
+                    }}
+                />
+                <View style={styles.overlay}>
+                    <View style={styles.scanFrame} />
+                    <Text style={styles.overlayText}>Align QR code within the frame</Text>
                 </View>
             </View>
 
-            {/* Instructions */}
-            <View style={styles.instructionsContainer}>
-                <Text style={styles.instructionsTitle}>Position QR Code in Frame</Text>
-                <Text style={styles.instructionsText}>
-                    Align the customer's QR code within the frame to scan
-                </Text>
-            </View>
+            {/* Simulation Buttons (Hidden in production, useful for dev) */}
+            {/* Simulation Buttons (Hidden for production/real testing) */}
+            {/* 
+            <View style={styles.simulationContainer}>
+                <Text style={styles.simulationTitle}>Dev Simulation:</Text>
+                <View style={styles.simulationButtons}>
+                    <TouchableOpacity
+                        style={[styles.simButton, { backgroundColor: '#4CAF50' }]}
+                        onPress={() => simulateScan('user')}
+                    >
+                        <Text style={styles.simButtonText}>Simulate User QR</Text>
+                    </TouchableOpacity>
 
-            {/* Simulate Scan Button (for testing) */}
-            <TouchableOpacity style={styles.simulateButton} onPress={handleSimulateScan}>
-                <Ionicons name="flash-outline" size={24} color="white" />
-                <Text style={styles.simulateButtonText}>Tap to Simulate Scan</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.simButton, { backgroundColor: '#2196F3' }]}
+                        onPress={() => simulateScan('ticket')}
+                    >
+                        <Text style={styles.simButtonText}>Simulate Ticket QR</Text>
+                    </TouchableOpacity>
+                </View>
+            </View> 
+            */}
         </SafeAreaView>
     );
 }
@@ -55,94 +109,112 @@ export default function ScanTicketScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: 'black',
+    },
+    permissionContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f9f9f9',
+        padding: 20,
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 20,
+        fontSize: 16,
+        color: '#333',
+        marginTop: 20,
+    },
+    permissionButton: {
+        backgroundColor: 'tomato',
+        paddingHorizontal: 30,
+        paddingVertical: 12,
+        borderRadius: 8,
+    },
+    permissionButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 20,
+        padding: 16,
+        position: 'absolute',
+        top: 40, // Adjust for status bar
+        left: 0,
+        right: 0,
+        zIndex: 10,
+    },
+    headerTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     backButton: {
         padding: 8,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    cameraPlaceholder: {
+    cameraContainer: {
         flex: 1,
+        overflow: 'hidden',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+    },
+    camera: {
+        flex: 1,
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#1a1a1a',
     },
     scanFrame: {
-        width: 280,
-        height: 280,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
+        width: 250,
+        height: 250,
+        borderWidth: 2,
+        borderColor: 'white',
+        backgroundColor: 'transparent',
+        borderRadius: 20,
     },
-    corner: {
-        position: 'absolute',
-        width: 40,
-        height: 40,
-        borderColor: 'tomato',
-    },
-    topLeft: {
-        top: 0,
-        left: 0,
-        borderTopWidth: 4,
-        borderLeftWidth: 4,
-    },
-    topRight: {
-        top: 0,
-        right: 0,
-        borderTopWidth: 4,
-        borderRightWidth: 4,
-    },
-    bottomLeft: {
-        bottom: 0,
-        left: 0,
-        borderBottomWidth: 4,
-        borderLeftWidth: 4,
-    },
-    bottomRight: {
-        bottom: 0,
-        right: 0,
-        borderBottomWidth: 4,
-        borderRightWidth: 4,
-    },
-    instructionsContainer: {
-        padding: 30,
-        alignItems: 'center',
-    },
-    instructionsTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+    overlayText: {
         color: 'white',
-        marginBottom: 8,
-    },
-    instructionsText: {
-        fontSize: 14,
-        color: 'rgba(255,255,255,0.7)',
-        textAlign: 'center',
-    },
-    simulateButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'tomato',
-        marginHorizontal: 20,
-        marginBottom: 30,
-        padding: 18,
-        borderRadius: 12,
-        gap: 12,
-    },
-    simulateButtonText: {
-        color: 'white',
+        marginTop: 20,
         fontSize: 16,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    simulationContainer: {
+        padding: 20,
+        backgroundColor: '#222',
+    },
+    simulationTitle: {
+        color: '#aaa',
+        marginBottom: 10,
+        fontSize: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    simulationButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 10,
+    },
+    simButton: {
+        flex: 1,
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    simButtonText: {
+        color: 'white',
         fontWeight: 'bold',
+        fontSize: 12,
     },
 });

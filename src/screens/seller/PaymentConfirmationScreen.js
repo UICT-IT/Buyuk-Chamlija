@@ -57,6 +57,13 @@ export default function PaymentConfirmationScreen({ route, navigation }) {
                         <Text style={styles.totalLabel}>Total Amount</Text>
                         <Text style={styles.totalValue}>R{totalAmount}</Text>
                     </View>
+
+                    <View style={styles.divider} />
+
+                    <View style={styles.detailRow}>
+                        <Text style={styles.detailLabel}>Payment Method</Text>
+                        <Text style={styles.detailValue}>{route.params.paymentMethod}</Text>
+                    </View>
                 </View>
 
                 {/* Timestamp */}

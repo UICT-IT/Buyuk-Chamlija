@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -7,22 +7,39 @@ import { useAuth } from '../context/AuthContext';
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useAuth();
+    const { login, user } = useAuth();
+    const [justLoggedIn, setJustLoggedIn] = useState(false);
 
-    const handleLogin = () => {
+    // Redirect after login based on user type
+    useEffect(() => {
+        if (justLoggedIn && user) {
+            setJustLoggedIn(false);
+
+            if (user.isSeller) {
+                // Redirect sellers directly to their dashboard (seller-only mode)
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Main' }],
+                });
+            } else {
+                // Normal users go to main tabs
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Main' }],
+                });
+            }
+        }
+    }, [user, justLoggedIn, navigation]);
+
+    const handleLogin = async () => {
         if (!email || !password) {
             Alert.alert('Error', 'Please enter both email and password.');
             return;
         }
 
-        const result = login(email, password);
+        const result = await login(email, password);
         if (result.success) {
-            // Navigate to the Main stack (which contains the Tab Navigator)
-            // We reset the navigation stack so the user can't go back to login easily
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Main' }],
-            });
+            setJustLoggedIn(true);
         } else {
             Alert.alert('Error', result.message);
         }
